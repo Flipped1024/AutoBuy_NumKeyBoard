@@ -39,14 +39,14 @@
 #define NUM_KEYS 3
 #define DELAY_MS 25
 
-#define LED38_Pin GPIO_PIN_15
-#define LED38_GPIO_Port GPIOB
+// #define LED38_Pin GPIO_PIN_15
+// #define LED38_GPIO_Port GPIOB
 #define KEY_50_Pin GPIO_PIN_14
 #define KEY1_GPIO_Port GPIOB
-#define KEY_100_Pin GPIO_PIN_13
+#define KEY_100_Pin GPIO_PIN_15
 #define KEY2_GPIO_Port GPIOB
-#define KEY_200_Pin GPIO_PIN_12
-#define KEY3_GPIO_Port GPIOB
+#define KEY_200_Pin GPIO_PIN_8
+#define KEY3_GPIO_Port GPIOA
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -225,7 +225,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }
