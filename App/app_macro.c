@@ -3,8 +3,6 @@
 #include "referee_protocol.h"
 #include "referee_frame_process.h"
 #include "string.h"
-
-// 结构体：宏引擎状态上下文 (大驼峰)
 typedef struct {
     bool is_running_;
     const MacroFrame* current_sequence_;
