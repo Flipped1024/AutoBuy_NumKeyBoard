@@ -27,6 +27,7 @@
 #include "stdint.h"
 #include "referee_protocol.h"
 #include "referee_frame_process.h"
+#include "app_keyboard.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,15 +39,6 @@
 /* USER CODE BEGIN PD */
 #define NUM_KEYS 3
 #define DELAY_MS 25
-
-// #define LED38_Pin GPIO_PIN_15
-// #define LED38_GPIO_Port GPIOB
-#define KEY_50_Pin GPIO_PIN_14
-#define KEY1_GPIO_Port GPIOB
-#define KEY_100_Pin GPIO_PIN_15
-#define KEY2_GPIO_Port GPIOB
-#define KEY_200_Pin GPIO_PIN_8
-#define KEY3_GPIO_Port GPIOA
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,34 +49,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-bool key_pressed[NUM_KEYS] = {false};
-bool key_flag[NUM_KEYS] = {true}; 
 
-custom_client_data_t custom_client_data = {0};
-uint8_t client_data[8] = {0};
-
-typedef struct {
-    uint16_t x_pos;
-    uint16_t y_pos;
-} Position;
-
-const Position key_positions[NUM_KEYS] = {
-    {1160, 560},  //50�?
-    {1210, 560},  //100�?
-    {1210, 560}   
-};
-
-const Position common_positions[3] = {
-    {960, 670},   
-    {860, 560}  //确认
-};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void send_mouse_sequence(uint16_t x, uint16_t y);
-void send_common_sequence(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -123,10 +94,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t Led_state = GPIO_PIN_RESET;
-  uint8_t Lastkey1_state = GPIO_PIN_SET;
-  uint8_t Lastkey2_state = GPIO_PIN_SET;
-  uint8_t Lastkey3_state = GPIO_PIN_SET;
+  appKeyboardInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -136,61 +104,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    for (int i = 0; i < NUM_KEYS; i++)
-    {
-      GPIO_PinState pin_state;
-      
-      switch (i) 
-      {
-        case 0: pin_state = HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY_50_Pin); break;
-        case 1: pin_state = HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY_100_Pin); break;
-        case 2: pin_state = HAL_GPIO_ReadPin(KEY3_GPIO_Port, KEY_200_Pin); break;
-      }
-      
-      key_pressed[i] = (pin_state == GPIO_PIN_RESET);
-      if (pin_state == GPIO_PIN_SET) 
-      {
-        key_flag[i] = false;
-      }
-      
-      if (key_pressed[i] && !key_flag[i]) 
-      {
-        custom_client_data = (custom_client_data_t)
-        {
-          .key_value = 79,
-          .x_position = 0,
-          .y_position = 0,
-          .mouse_left = 0,
-          .mouse_right = 0
-        };
-        memcpy(client_data, &custom_client_data, 8);
-        HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data, 8), getRefSentDataLen(), 30);
-        HAL_Delay(DELAY_MS);
-
-        send_mouse_sequence(key_positions[i].x_pos, key_positions[i].y_pos);
-        if(i == 2)
-        send_mouse_sequence(key_positions[i].x_pos, key_positions[i].y_pos);
-
-        send_common_sequence();
-            
-        custom_client_data = (custom_client_data_t){
-          .key_value = 79,
-          .x_position = 0,
-          .y_position = 0,
-          .mouse_left = 0,
-          .mouse_right = 0
-        };
-        memcpy(client_data, &custom_client_data, 8);
-        HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data, 8), getRefSentDataLen(), 30);
-        HAL_Delay(DELAY_MS);
-    
-        send_mouse_sequence(0, 0);
-
-        key_flag[i] = true;
-        key_pressed[i] = false;
-        }
-    }
-    HAL_Delay(10);
+    appKeyboardUpdate();
   }
   /* USER CODE END 3 */
 }
@@ -232,35 +146,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void send_mouse_sequence(uint16_t x, uint16_t y)
-{
-    custom_client_data = (custom_client_data_t){
-        .key_value = 0,			//网上任意键值
-        .x_position = x,
-        .y_position = y,
-        .mouse_left = 0,
-        .mouse_right = 0
-    };
-    memcpy(client_data, &custom_client_data, 8);
-    HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data, 8), getRefSentDataLen(), 30);
-    HAL_Delay(DELAY_MS);
-    
-    custom_client_data.mouse_left = 1;
-    memcpy(client_data, &custom_client_data, 8);
-    HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data, 8), getRefSentDataLen(), 30);
-    HAL_Delay(DELAY_MS);
-    
-    custom_client_data.mouse_left = 0;
-    memcpy(client_data, &custom_client_data, 8);
-    HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data, 8), getRefSentDataLen(), 30);
-    HAL_Delay(DELAY_MS);
-}
-void send_common_sequence(void)
-{
-    send_mouse_sequence(common_positions[0].x_pos, common_positions[0].y_pos);
-    
-    send_mouse_sequence(common_positions[1].x_pos, common_positions[1].y_pos);
-}
+
 /* USER CODE END 4 */
 
 /**

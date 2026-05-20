@@ -71,28 +71,28 @@ void Error_Handler(void);
 #define K_5_GPIO_Port GPIOB
 #define K_6_Pin GPIO_PIN_1
 #define K_6_GPIO_Port GPIOB
-#define K___Pin GPIO_PIN_2
-#define K___GPIO_Port GPIOB
+#define K_MINUS_Pin GPIO_PIN_2
+#define K_MINUS_GPIO_Port GPIOB
 #define K_1_Pin GPIO_PIN_10
 #define K_1_GPIO_Port GPIOB
 #define K_2_Pin GPIO_PIN_11
 #define K_2_GPIO_Port GPIOB
 #define K_3_Pin GPIO_PIN_12
 #define K_3_GPIO_Port GPIOB
-#define K__B13_Pin GPIO_PIN_13
-#define K__B13_GPIO_Port GPIOB
+#define K_PLUS_Pin GPIO_PIN_13
+#define K_PLUS_GPIO_Port GPIOB
 #define K_0_Pin GPIO_PIN_14
 #define K_0_GPIO_Port GPIOB
-#define K__B15_Pin GPIO_PIN_15
-#define K__B15_GPIO_Port GPIOB
+#define K_DOT_Pin GPIO_PIN_15
+#define K_DOT_GPIO_Port GPIOB
 #define K_ENTER_Pin GPIO_PIN_8
 #define K_ENTER_GPIO_Port GPIOA
 #define K_NUM_Pin GPIO_PIN_7
 #define K_NUM_GPIO_Port GPIOB
-#define K__B8_Pin GPIO_PIN_8
-#define K__B8_GPIO_Port GPIOB
-#define K__B9_Pin GPIO_PIN_9
-#define K__B9_GPIO_Port GPIOB
+#define K_DIVISION_Pin GPIO_PIN_8
+#define K_DIVISION_GPIO_Port GPIOB
+#define K_MULTIPLE_Pin GPIO_PIN_9
+#define K_MULTIPLE_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

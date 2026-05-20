@@ -57,12 +57,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : K_5_Pin K_6_Pin K___Pin K_1_Pin
-                           K_2_Pin K_3_Pin K__B13_Pin K_0_Pin
-                           K__B15_Pin K_NUM_Pin K__B8_Pin K__B9_Pin */
-  GPIO_InitStruct.Pin = K_5_Pin|K_6_Pin|K___Pin|K_1_Pin
-                          |K_2_Pin|K_3_Pin|K__B13_Pin|K_0_Pin
-                          |K__B15_Pin|K_NUM_Pin|K__B8_Pin|K__B9_Pin;
+  /*Configure GPIO pins : K_5_Pin K_6_Pin K_MINUS_Pin K_1_Pin
+                           K_2_Pin K_3_Pin K_PLUS_Pin K_0_Pin
+                           K_DOT_Pin K_NUM_Pin K_DIVISION_Pin K_MULTIPLE_Pin */
+  GPIO_InitStruct.Pin = K_5_Pin|K_6_Pin|K_MINUS_Pin|K_1_Pin
+                          |K_2_Pin|K_3_Pin|K_PLUS_Pin|K_0_Pin
+                          |K_DOT_Pin|K_NUM_Pin|K_DIVISION_Pin|K_MULTIPLE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
