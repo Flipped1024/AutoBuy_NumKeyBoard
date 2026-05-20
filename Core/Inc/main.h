@@ -57,12 +57,42 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define KEY_1_Pin GPIO_PIN_14
-#define KEY_1_GPIO_Port GPIOB
-#define KEY_2_Pin GPIO_PIN_15
-#define KEY_2_GPIO_Port GPIOB
-#define KEY_3_Pin GPIO_PIN_8
-#define KEY_3_GPIO_Port GPIOA
+#define K_BACK_Pin GPIO_PIN_3
+#define K_BACK_GPIO_Port GPIOA
+#define K_9_Pin GPIO_PIN_4
+#define K_9_GPIO_Port GPIOA
+#define K_8_Pin GPIO_PIN_5
+#define K_8_GPIO_Port GPIOA
+#define K_7_Pin GPIO_PIN_6
+#define K_7_GPIO_Port GPIOA
+#define K_4_Pin GPIO_PIN_7
+#define K_4_GPIO_Port GPIOA
+#define K_5_Pin GPIO_PIN_0
+#define K_5_GPIO_Port GPIOB
+#define K_6_Pin GPIO_PIN_1
+#define K_6_GPIO_Port GPIOB
+#define K___Pin GPIO_PIN_2
+#define K___GPIO_Port GPIOB
+#define K_1_Pin GPIO_PIN_10
+#define K_1_GPIO_Port GPIOB
+#define K_2_Pin GPIO_PIN_11
+#define K_2_GPIO_Port GPIOB
+#define K_3_Pin GPIO_PIN_12
+#define K_3_GPIO_Port GPIOB
+#define K__B13_Pin GPIO_PIN_13
+#define K__B13_GPIO_Port GPIOB
+#define K_0_Pin GPIO_PIN_14
+#define K_0_GPIO_Port GPIOB
+#define K__B15_Pin GPIO_PIN_15
+#define K__B15_GPIO_Port GPIOB
+#define K_ENTER_Pin GPIO_PIN_8
+#define K_ENTER_GPIO_Port GPIOA
+#define K_NUM_Pin GPIO_PIN_7
+#define K_NUM_GPIO_Port GPIOB
+#define K__B8_Pin GPIO_PIN_8
+#define K__B8_GPIO_Port GPIOB
+#define K__B9_Pin GPIO_PIN_9
+#define K__B9_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

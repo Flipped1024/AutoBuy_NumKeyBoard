@@ -46,20 +46,26 @@ void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pins : KEY_1_Pin KEY_2_Pin */
-  GPIO_InitStruct.Pin = KEY_1_Pin|KEY_2_Pin;
+  /*Configure GPIO pins : K_BACK_Pin K_9_Pin K_8_Pin K_7_Pin
+                           K_4_Pin K_ENTER_Pin */
+  GPIO_InitStruct.Pin = K_BACK_Pin|K_9_Pin|K_8_Pin|K_7_Pin
+                          |K_4_Pin|K_ENTER_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : K_5_Pin K_6_Pin K___Pin K_1_Pin
+                           K_2_Pin K_3_Pin K__B13_Pin K_0_Pin
+                           K__B15_Pin K_NUM_Pin K__B8_Pin K__B9_Pin */
+  GPIO_InitStruct.Pin = K_5_Pin|K_6_Pin|K___Pin|K_1_Pin
+                          |K_2_Pin|K_3_Pin|K__B13_Pin|K_0_Pin
+                          |K__B15_Pin|K_NUM_Pin|K__B8_Pin|K__B9_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : KEY_3_Pin */
-  GPIO_InitStruct.Pin = KEY_3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(KEY_3_GPIO_Port, &GPIO_InitStruct);
 
 }
 
