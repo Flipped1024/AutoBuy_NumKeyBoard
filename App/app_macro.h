@@ -10,7 +10,7 @@ typedef struct {
     uint16_t y_position_;
     uint8_t mouse_left_;
     uint8_t mouse_right_;
-    uint32_t delay_after_ms_; 
+    uint32_t duration_ms_;  // 修改：表示该状态需要以30Hz频率持续发送的总时长
 } MacroFrame;
 
 void appMacroInit(void);

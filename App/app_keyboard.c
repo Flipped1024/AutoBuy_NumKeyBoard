@@ -29,77 +29,150 @@ typedef enum
 
 static KeyboardMode current_mode_ = MODE_MACRO_KEYBOARD;
 
-// {键值, X, Y, 左键, 右键, 帧后延时}
+// 统一动作时长常量设定
+#define MACRO_KEY_PRESS_DURATION   50 // 按压按键持续时间 (确保接收)
+#define MACRO_UI_RENDER_DELAY      10 // 强制等待UI界面渲染时间
+#define MACRO_MOUSE_HOVER_DURATION 10  // 鼠标绝对位移悬停时间
+#define MACRO_MOUSE_CLICK_DURATION 50 // 鼠标点击保持时间
+
+// {键值, X, Y, 左键, 右键, 动作总持续时长}
 static const MacroFrame MACRO_SEQUENCE_10[] = {
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 1046, 581, 0, 0, MACRO_STD_DELAY},
-    {0, 1046, 581, 1, 0, MACRO_STD_DELAY},
-    {0, 1046, 581, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 1, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 1, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 0, 0, 0, 0, 0}};
+    // 呼出商店
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    // 等待 UI 渲染 (发送全0空报文占位)
+    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    
+    // 选择发弹量：移动悬停 -> 按下 -> 抬起悬停
+    {0, 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 1046, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    // 确认通用坐标 1
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    // 确认通用坐标 2
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    // 关闭商店
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    // 完全清空，避免按键粘连
+    {0, 0, 0, 0, 0, 33}
+};
 
 static const MacroFrame MACRO_SEQUENCE_20[] = {
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 1108, 584, 0, 0, MACRO_STD_DELAY},
-    {0, 1108, 584, 1, 0, MACRO_STD_DELAY},
-    {0, 1108, 584, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 1, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 1, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 0, 0, 0, 0, 0}};
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    
+    {0, 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 1108, 584, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, 33}
+};
 
 static const MacroFrame MACRO_SEQUENCE_50[] = {
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 1157, 583, 0, 0, MACRO_STD_DELAY},
-    {0, 1157, 583, 1, 0, MACRO_STD_DELAY},
-    {0, 1157, 583, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 1, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 1, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 0, 0, 0, 0, 0}};
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    
+    {0, 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 1157, 583, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, 33}
+};
 
 static const MacroFrame MACRO_SEQUENCE_100[] = {
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 1210, 581, 0, 0, MACRO_STD_DELAY},
-    {0, 1210, 581, 1, 0, MACRO_STD_DELAY},
-    {0, 1210, 581, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 1, 0, MACRO_STD_DELAY},
-    {0, 960, 670, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 1, 0, MACRO_STD_DELAY},
-    {0, 860, 560, 0, 0, MACRO_STD_DELAY},
-    {79, 0, 0, 0, 0, MACRO_STD_DELAY},
-    {0, 0, 0, 0, 0, 0}};
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    
+    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, 33}
+};
+
+static const MacroFrame MACRO_SEQUENCE_200[] = {
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    
+    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    
+    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    
+    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {0, 0, 0, 0, 0, 33}
+};
 
 static const MacroFrame MACRO_SEQUENCE_ADDHEALTH[] = {
-    {72, 0, 0, 0, 0, MACRO_STD_DELAY}, // H
-    {17, 0, 0, 0, 0, MACRO_STD_DELAY}, // Ctrl
-    {49, 0, 0, 0, 0, MACRO_STD_DELAY}, // 1
-    {89, 0, 0, 0, 0, MACRO_STD_DELAY}, // Y
-    {0, 0, 0, 0, 0, 0}                 // end
+    {72, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {17, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {49, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {89, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {0, 0, 0, 0, 0, 33}                 
 };
 
 static const MacroFrame MACRO_SEQUENCE_ADDBULLET[] = {
-    {72, 0, 0, 0, 0, MACRO_STD_DELAY}, // H
-    {17, 0, 0, 0, 0, MACRO_STD_DELAY}, // Ctrl
-    {50, 0, 0, 0, 0, MACRO_STD_DELAY}, // 2
-    {89, 0, 0, 0, 0, MACRO_STD_DELAY}, // Y
-    {0, 0, 0, 0, 0, 0}                 // end
+    {72, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {17, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {50, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {89, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {0, 0, 0, 0, 0, 33}                 
 };
 
 #define SEQ_LEN(seq) (sizeof(seq) / sizeof(MacroFrame))
@@ -177,6 +250,9 @@ void appKeyboardUpdate(void)
                 break;
             case KEY_EVENT_PLUS_PRESSED: // 100DAN
                 appMacroPlay(MACRO_SEQUENCE_100, SEQ_LEN(MACRO_SEQUENCE_100));
+                break;
+            case KEY_EVENT_ENTER_PRESSED: // 200DAN
+                appMacroPlay(MACRO_SEQUENCE_200, SEQ_LEN(MACRO_SEQUENCE_200));
                 break;
             case KEY_EVENT_0_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_ADDHEALTH, SEQ_LEN(MACRO_SEQUENCE_ADDHEALTH));

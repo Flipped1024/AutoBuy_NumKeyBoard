@@ -110,6 +110,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    // 修复：防止裁判系统下发数据引发 UART ORE 从而导致发送总线永久死锁
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE) != RESET)
+    {
+      __HAL_UART_CLEAR_OREFLAG(&huart1);
+    }
+
     int32_t ec11_count = appEc11GetCount();
     Ec11ButtonState btn_state = appEc11GetButtonState();
 
