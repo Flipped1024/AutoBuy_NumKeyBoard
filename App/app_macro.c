@@ -49,7 +49,6 @@ void appMacroUpdate(void) {
 
     uint32_t current_tick = HAL_GetTick();
 
-    // 1. 检查当前动作持续时间是否结束，切换到下一个动作
     if (current_tick - macro_ctx_.step_start_tick_ >= macro_ctx_.current_sequence_[macro_ctx_.current_step_].duration_ms_) {
         macro_ctx_.current_step_++;
         macro_ctx_.step_start_tick_ = current_tick;
@@ -60,7 +59,6 @@ void appMacroUpdate(void) {
         }
     }
 
-    // 2. 按 30Hz (约33ms) 的频率连续发送，防止客户端引擎滤除噪声
     if (current_tick - macro_ctx_.last_tx_tick_ >= 33) {
         const MacroFrame* current_frame = &macro_ctx_.current_sequence_[macro_ctx_.current_step_];
         

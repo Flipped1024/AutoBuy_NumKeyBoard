@@ -29,150 +29,116 @@ typedef enum
 
 static KeyboardMode current_mode_ = MODE_MACRO_KEYBOARD;
 
-// 统一动作时长常量设定
-#define MACRO_KEY_PRESS_DURATION   50 // 按压按键持续时间 (确保接收)
-#define MACRO_UI_RENDER_DELAY      10 // 强制等待UI界面渲染时间
-#define MACRO_MOUSE_HOVER_DURATION 10  // 鼠标绝对位移悬停时间
-#define MACRO_MOUSE_CLICK_DURATION 50 // 鼠标点击保持时间
+#define MACRO_KEY_PRESS_DURATION   50 
+#define MACRO_UI_RENDER_DELAY      10 
+#define MACRO_MOUSE_HOVER_DURATION 10  
+#define MACRO_MOUSE_CLICK_DURATION 50 
 
-// {键值, X, Y, 左键, 右键, 动作总持续时长}
+//{DUAL_KEY(键1, 键2), x坐标, y坐标, 鼠标左键状态, 鼠标右键状态, 持续时间ms}
 static const MacroFrame MACRO_SEQUENCE_10[] = {
-    // 呼出商店
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    // 等待 UI 渲染 (发送全0空报文占位)
-    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
-    
-    // 选择发弹量：移动悬停 -> 按下 -> 抬起悬停
-    {0, 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 1046, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    // 确认通用坐标 1
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    // 确认通用坐标 2
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    // 关闭商店
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    // 完全清空，避免按键粘连
-    {0, 0, 0, 0, 0, 33}
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    {DUAL_KEY(0, 0), 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 1046, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
 };
 
 static const MacroFrame MACRO_SEQUENCE_20[] = {
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
-    
-    {0, 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 1108, 584, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, 33}
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    {DUAL_KEY(0, 0), 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 1108, 584, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
 };
 
 static const MacroFrame MACRO_SEQUENCE_50[] = {
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
-    
-    {0, 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 1157, 583, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, 33}
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    {DUAL_KEY(0, 0), 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 1157, 583, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
 };
 
 static const MacroFrame MACRO_SEQUENCE_100[] = {
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
-    
-    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, 33}
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
 };
 
 static const MacroFrame MACRO_SEQUENCE_200[] = {
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
-    
-    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
-    
-    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    {0, 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
-    {0, 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
-    
-    {79, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {0, 0, 0, 0, 0, 33}
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+    {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+    {DUAL_KEY(0, 0), 860, 560, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+    {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
 };
 
 static const MacroFrame MACRO_SEQUENCE_ADDHEALTH[] = {
-    {72, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {17, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {49, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {89, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {0, 0, 0, 0, 0, 33}                 
+    {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {DUAL_KEY(17, 49), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}                 
 };
 
 static const MacroFrame MACRO_SEQUENCE_ADDBULLET[] = {
-    {72, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {17, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {50, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {89, 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {0, 0, 0, 0, 0, 33}                 
+    {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {DUAL_KEY(17, 50), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}                 
 };
 
 #define SEQ_LEN(seq) (sizeof(seq) / sizeof(MacroFrame))
@@ -216,9 +182,7 @@ void appKeyboardInit(void)
 
 void appKeyboardUpdate(void)
 {
-
     static Ec11ButtonState last_btn_state = EC11_BTN_RELEASED;
-
     Ec11ButtonState current_btn_state = appEc11GetButtonState();
     KeyEvent event = bspKeyScan();
 
@@ -226,7 +190,7 @@ void appKeyboardUpdate(void)
     {
         current_mode_ = (current_mode_ == MODE_NORMAL_KEYBOARD) ? MODE_MACRO_KEYBOARD : MODE_NORMAL_KEYBOARD;
     }
-    last_btn_state = current_btn_state; // 更新上一帧状态
+    last_btn_state = current_btn_state; 
 
     if (event == KEY_EVENT_TOGGLE_MODE)
     {
@@ -239,25 +203,27 @@ void appKeyboardUpdate(void)
         {
             switch (event)
             {
-            case KEY_EVENT_1_PRESSED: // 10DAN
+            case KEY_EVENT_1_PRESSED: 
                 appMacroPlay(MACRO_SEQUENCE_10, SEQ_LEN(MACRO_SEQUENCE_10));
                 break;
-            case KEY_EVENT_2_PRESSED: // 20DAN
+            case KEY_EVENT_2_PRESSED: 
                 appMacroPlay(MACRO_SEQUENCE_20, SEQ_LEN(MACRO_SEQUENCE_20));
                 break;
-            case KEY_EVENT_3_PRESSED: // 50DAN
+            case KEY_EVENT_3_PRESSED: 
                 appMacroPlay(MACRO_SEQUENCE_50, SEQ_LEN(MACRO_SEQUENCE_50));
                 break;
-            case KEY_EVENT_PLUS_PRESSED: // 100DAN
+            case KEY_EVENT_PLUS_PRESSED: 
                 appMacroPlay(MACRO_SEQUENCE_100, SEQ_LEN(MACRO_SEQUENCE_100));
                 break;
-            case KEY_EVENT_ENTER_PRESSED: // 200DAN
+            case KEY_EVENT_ENTER_PRESSED: 
                 appMacroPlay(MACRO_SEQUENCE_200, SEQ_LEN(MACRO_SEQUENCE_200));
                 break;
             case KEY_EVENT_0_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_ADDHEALTH, SEQ_LEN(MACRO_SEQUENCE_ADDHEALTH));
+                break;
             case KEY_EVENT_DOT_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_ADDBULLET, SEQ_LEN(MACRO_SEQUENCE_ADDBULLET));
+                break;
             default:
                 break;
             }
@@ -288,10 +254,6 @@ static void processNormalKeyboard(void)
     }
     last_scan_time = current_tick;
 
-    // USB HID 键盘报文格式:
-    // Byte 0: 控制键 (Ctrl/Shift/Alt/GUI) - 默认为 0
-    // Byte 1: 保留字 - 默认为 0
-    // Byte 2-7: 普通按键 (最多 6 键无冲)
     uint8_t key_index = 2;
 
     for (int i = 0; i < NUMPAD_KEY_COUNT; i++)
@@ -299,7 +261,8 @@ static void processNormalKeyboard(void)
         if (HAL_GPIO_ReadPin(NUMPAD_MAP[i].port_, NUMPAD_MAP[i].pin_) == GPIO_PIN_RESET)
         {
             current_report[key_index++] = NUMPAD_MAP[i].hid_code_;
-            if (key_index >= 8)
+            
+            if (key_index >= 4)
             {
                 break;
             }
@@ -309,7 +272,6 @@ static void processNormalKeyboard(void)
     if (memcmp(last_report, current_report, 8) != 0)
     {
         memcpy(last_report, current_report, 8);
-
         USBD_HID_SendReport(&hUsbDeviceFS, current_report, 8);
     }
 }
@@ -317,14 +279,16 @@ static void processNormalKeyboard(void)
 /**
  * @brief  向电脑发送指定按键
  * @param  modifier: 修饰键状态值 (如 KEY_MOD_LSHIFT)
- * @param  key_code: 标准 USB HID 键码 (如 'A' 对应 0x04)
+ * @param  key_code1: 标准 USB HID 键码1
+ * @param  key_code2: 标准 USB HID 键码2 (无需组合时填 0)
  */
-void Keyboard_Send_Key(uint8_t modifier, uint8_t key_code)
+void Keyboard_Send_Key(uint8_t modifier, uint8_t key_code1, uint8_t key_code2)
 {
     memset(&keyboard_report, 0, sizeof(Keyboard_Report_t));
 
     keyboard_report.modifier = modifier;
-    keyboard_report.keycode[0] = key_code; // 放入第一个键槽
+    keyboard_report.keycode[0] = key_code1;
+    keyboard_report.keycode[1] = key_code2;
 
     USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboard_report, sizeof(Keyboard_Report_t));
     HAL_Delay(20);

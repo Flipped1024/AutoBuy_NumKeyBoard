@@ -1,6 +1,7 @@
 #ifndef APP_KEYBOARD_H
 #define APP_KEYBOARD_H
 
+#include <stdint.h> 
 
 #define KEY_MOD_LCTRL  0x01
 #define KEY_MOD_LSHIFT 0x02
@@ -17,5 +18,7 @@
 
 void appKeyboardInit(void);
 void appKeyboardUpdate(void);
+
+void Keyboard_Send_Key(uint8_t modifier, uint8_t key_code1, uint8_t key_code2);
 
 #endif // APP_KEYBOARD_H
