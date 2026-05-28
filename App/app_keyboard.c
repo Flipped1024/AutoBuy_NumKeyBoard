@@ -29,10 +29,10 @@ typedef enum
 
 static KeyboardMode current_mode_ = MODE_MACRO_KEYBOARD;
 
-#define MACRO_KEY_PRESS_DURATION   50 
-#define MACRO_UI_RENDER_DELAY      10 
-#define MACRO_MOUSE_HOVER_DURATION 10  
-#define MACRO_MOUSE_CLICK_DURATION 50 
+#define MACRO_KEY_PRESS_DURATION 50
+#define MACRO_UI_RENDER_DELAY 10
+#define MACRO_MOUSE_HOVER_DURATION 10
+#define MACRO_MOUSE_CLICK_DURATION 50
 
 //{DUAL_KEY(键1, 键2), x坐标, y坐标, 鼠标左键状态, 鼠标右键状态, 持续时间ms}
 static const MacroFrame MACRO_SEQUENCE_10[] = {
@@ -50,8 +50,7 @@ static const MacroFrame MACRO_SEQUENCE_10[] = {
     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
-};
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 static const MacroFrame MACRO_SEQUENCE_20[] = {
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
@@ -68,8 +67,7 @@ static const MacroFrame MACRO_SEQUENCE_20[] = {
     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
-};
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 static const MacroFrame MACRO_SEQUENCE_50[] = {
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
@@ -86,8 +84,7 @@ static const MacroFrame MACRO_SEQUENCE_50[] = {
     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
-};
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 static const MacroFrame MACRO_SEQUENCE_100[] = {
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
@@ -104,8 +101,7 @@ static const MacroFrame MACRO_SEQUENCE_100[] = {
     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
-};
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 static const MacroFrame MACRO_SEQUENCE_200[] = {
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
@@ -134,22 +130,19 @@ static const MacroFrame MACRO_SEQUENCE_200[] = {
     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}
-};
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 static const MacroFrame MACRO_SEQUENCE_ADDHEALTH[] = {
-    {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {DUAL_KEY(17, 49), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}                 
-};
+    {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(17, 49), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 static const MacroFrame MACRO_SEQUENCE_ADDBULLET[] = {
-    {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {DUAL_KEY(17, 50), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION}, 
-    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}                 
-};
+    {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(17, 50), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+    {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
 
 #define SEQ_LEN(seq) (sizeof(seq) / sizeof(MacroFrame))
 
@@ -200,7 +193,7 @@ void appKeyboardUpdate(void)
     {
         current_mode_ = (current_mode_ == MODE_NORMAL_KEYBOARD) ? MODE_MACRO_KEYBOARD : MODE_NORMAL_KEYBOARD;
     }
-    last_btn_state = current_btn_state; 
+    last_btn_state = current_btn_state;
 
     if (event == KEY_EVENT_TOGGLE_MODE)
     {
@@ -213,19 +206,19 @@ void appKeyboardUpdate(void)
         {
             switch (event)
             {
-            case KEY_EVENT_1_PRESSED: 
+            case KEY_EVENT_1_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_10, SEQ_LEN(MACRO_SEQUENCE_10));
                 break;
-            case KEY_EVENT_2_PRESSED: 
+            case KEY_EVENT_2_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_20, SEQ_LEN(MACRO_SEQUENCE_20));
                 break;
-            case KEY_EVENT_3_PRESSED: 
+            case KEY_EVENT_3_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_50, SEQ_LEN(MACRO_SEQUENCE_50));
                 break;
-            case KEY_EVENT_PLUS_PRESSED: 
+            case KEY_EVENT_PLUS_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_100, SEQ_LEN(MACRO_SEQUENCE_100));
                 break;
-            case KEY_EVENT_ENTER_PRESSED: 
+            case KEY_EVENT_ENTER_PRESSED:
                 appMacroPlay(MACRO_SEQUENCE_200, SEQ_LEN(MACRO_SEQUENCE_200));
                 break;
             case KEY_EVENT_0_PRESSED:
@@ -271,7 +264,7 @@ static void processNormalKeyboard(void)
         if (HAL_GPIO_ReadPin(NUMPAD_MAP[i].port_, NUMPAD_MAP[i].pin_) == GPIO_PIN_RESET)
         {
             current_report[key_index++] = NUMPAD_MAP[i].hid_code_;
-            
+
             if (key_index >= 4)
             {
                 break;
