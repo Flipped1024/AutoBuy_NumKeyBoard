@@ -29,10 +29,10 @@ typedef enum
 
 static KeyboardMode current_mode_ = MODE_MACRO_KEYBOARD;
 
-#define MACRO_KEY_PRESS_DURATION 50
-#define MACRO_UI_RENDER_DELAY 10
-#define MACRO_MOUSE_HOVER_DURATION 10
-#define MACRO_MOUSE_CLICK_DURATION 50
+#define MACRO_KEY_PRESS_DURATION 100
+#define MACRO_UI_RENDER_DELAY 200
+#define MACRO_MOUSE_HOVER_DURATION 300
+#define MACRO_MOUSE_CLICK_DURATION 100
 
 //{DUAL_KEY(键1, 键2), x坐标, y坐标, 鼠标左键状态, 鼠标右键状态, 持续时间ms}
 static const MacroFrame MACRO_SEQUENCE_10[] = {
