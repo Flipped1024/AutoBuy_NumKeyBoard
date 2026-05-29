@@ -1,0 +1,1007 @@
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"referee.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "rm_referee_system/referee.c"
+  18              		.section	.text.refereeInitData,"ax",%progbits
+  19              		.align	1
+  20              		.global	refereeInitData
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	refereeInitData:
+  26              	.LFB3:
+   1:rm_referee_system/referee.c **** #include "stdio.h"
+   2:rm_referee_system/referee.c **** #include "string.h"
+   3:rm_referee_system/referee.c **** 
+   4:rm_referee_system/referee.c **** #include "referee.h"
+   5:rm_referee_system/referee.c **** 
+   6:rm_referee_system/referee.c **** static game_status_t game_status;
+   7:rm_referee_system/referee.c **** static game_robot_HP_t game_robot_HP;
+   8:rm_referee_system/referee.c **** static robot_status_t robot_status;
+   9:rm_referee_system/referee.c **** static power_heat_data_t power_heat_data;
+  10:rm_referee_system/referee.c **** static shoot_data_t shoot_data;
+  11:rm_referee_system/referee.c **** static projectile_allowance_t projectile_allowance;
+  12:rm_referee_system/referee.c **** static uint8_t robot_interaction_message_data[118];
+  13:rm_referee_system/referee.c **** static custom_robot_data_t customer_controller_data;
+  14:rm_referee_system/referee.c **** static vt_link_remote_control_t vt_link_remote_control;
+  15:rm_referee_system/referee.c **** 
+  16:rm_referee_system/referee.c **** void refereeInitData(void)
+  17:rm_referee_system/referee.c **** {
+  27              		.loc 1 17 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31 0000 10B5     		push	{r4, lr}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+  35              		.cfi_offset 14, -4
+  18:rm_referee_system/referee.c ****     memset(&game_status, 0, sizeof(game_status_t));
+  36              		.loc 1 18 5 view .LVU1
+  37 0002 154B     		ldr	r3, .L3
+  38 0004 0024     		movs	r4, #0
+  39 0006 1C60     		str	r4, [r3]
+  40 0008 5C60     		str	r4, [r3, #4]
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 2
+
+
+  41 000a C3F80740 		str	r4, [r3, #7]	@ unaligned
+  19:rm_referee_system/referee.c ****     memset(&game_robot_HP, 0, sizeof(game_robot_HP_t));
+  42              		.loc 1 19 5 view .LVU2
+  43 000e 2022     		movs	r2, #32
+  44 0010 2146     		mov	r1, r4
+  45 0012 1248     		ldr	r0, .L3+4
+  46 0014 FFF7FEFF 		bl	memset
+  47              	.LVL0:
+  20:rm_referee_system/referee.c ****     memset(&robot_status, 0, sizeof(robot_status_t));
+  48              		.loc 1 20 5 view .LVU3
+  49 0018 114B     		ldr	r3, .L3+8
+  50 001a 1C60     		str	r4, [r3]
+  51 001c 5C60     		str	r4, [r3, #4]
+  52 001e 9C60     		str	r4, [r3, #8]
+  53 0020 1C73     		strb	r4, [r3, #12]
+  21:rm_referee_system/referee.c ****     memset(&power_heat_data, 0, sizeof(power_heat_data_t));
+  54              		.loc 1 21 5 view .LVU4
+  55 0022 104B     		ldr	r3, .L3+12
+  56 0024 1C60     		str	r4, [r3]
+  57 0026 5C60     		str	r4, [r3, #4]
+  58 0028 9C60     		str	r4, [r3, #8]
+  59 002a DC60     		str	r4, [r3, #12]
+  22:rm_referee_system/referee.c ****     memset(&shoot_data, 0, sizeof(shoot_data_t));
+  60              		.loc 1 22 5 view .LVU5
+  61 002c 0E4B     		ldr	r3, .L3+16
+  62 002e 1C60     		str	r4, [r3]
+  63 0030 C3F80340 		str	r4, [r3, #3]	@ unaligned
+  23:rm_referee_system/referee.c ****     memset(&projectile_allowance, 0, sizeof(projectile_allowance_t));
+  64              		.loc 1 23 5 view .LVU6
+  65 0034 0D4B     		ldr	r3, .L3+20
+  66 0036 1C60     		str	r4, [r3]
+  67 0038 9C80     		strh	r4, [r3, #4]	@ movhi
+  24:rm_referee_system/referee.c ****     memset(robot_interaction_message_data, 0, 118 * sizeof(uint8_t));
+  68              		.loc 1 24 5 view .LVU7
+  69 003a 7622     		movs	r2, #118
+  70 003c 2146     		mov	r1, r4
+  71 003e 0C48     		ldr	r0, .L3+24
+  72 0040 FFF7FEFF 		bl	memset
+  73              	.LVL1:
+  25:rm_referee_system/referee.c ****     memset(&customer_controller_data, 0, sizeof(custom_robot_data_t));
+  74              		.loc 1 25 5 view .LVU8
+  75 0044 1E22     		movs	r2, #30
+  76 0046 2146     		mov	r1, r4
+  77 0048 0A48     		ldr	r0, .L3+28
+  78 004a FFF7FEFF 		bl	memset
+  79              	.LVL2:
+  26:rm_referee_system/referee.c ****     memset(&vt_link_remote_control, 0, sizeof(vt_link_remote_control_t));
+  80              		.loc 1 26 5 view .LVU9
+  81 004e 0A4B     		ldr	r3, .L3+32
+  82 0050 1C60     		str	r4, [r3]
+  83 0052 5C60     		str	r4, [r3, #4]
+  84 0054 9C60     		str	r4, [r3, #8]
+  27:rm_referee_system/referee.c **** }
+  85              		.loc 1 27 1 is_stmt 0 view .LVU10
+  86 0056 10BD     		pop	{r4, pc}
+  87              	.L4:
+  88              		.align	2
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 3
+
+
+  89              	.L3:
+  90 0058 00000000 		.word	game_status
+  91 005c 00000000 		.word	game_robot_HP
+  92 0060 00000000 		.word	robot_status
+  93 0064 00000000 		.word	power_heat_data
+  94 0068 00000000 		.word	shoot_data
+  95 006c 00000000 		.word	projectile_allowance
+  96 0070 00000000 		.word	robot_interaction_message_data
+  97 0074 00000000 		.word	customer_controller_data
+  98 0078 00000000 		.word	vt_link_remote_control
+  99              		.cfi_endproc
+ 100              	.LFE3:
+ 102              		.section	.text.referee_data_decode,"ax",%progbits
+ 103              		.align	1
+ 104              		.global	referee_data_decode
+ 105              		.syntax unified
+ 106              		.thumb
+ 107              		.thumb_func
+ 109              	referee_data_decode:
+ 110              	.LVL3:
+ 111              	.LFB4:
+  28:rm_referee_system/referee.c **** 
+  29:rm_referee_system/referee.c **** void referee_data_decode(uint8_t *frame, uint16_t cmd_id)
+  30:rm_referee_system/referee.c **** {
+ 112              		.loc 1 30 1 is_stmt 1 view -0
+ 113              		.cfi_startproc
+ 114              		@ args = 0, pretend = 0, frame = 0
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+ 116              		@ link register save eliminated.
+ 117              		.loc 1 30 1 is_stmt 0 view .LVU12
+ 118 0000 8446     		mov	ip, r0
+  31:rm_referee_system/referee.c ****     uint8_t index = REF_HEADER_CMDID_LEN;
+ 119              		.loc 1 31 5 is_stmt 1 view .LVU13
+ 120              	.LVL4:
+  32:rm_referee_system/referee.c **** 
+  33:rm_referee_system/referee.c ****     switch (cmd_id)
+ 121              		.loc 1 33 5 view .LVU14
+ 122 0002 B1F5027F 		cmp	r1, #520
+ 123 0006 25D8     		bhi	.L6
+  30:rm_referee_system/referee.c ****     uint8_t index = REF_HEADER_CMDID_LEN;
+ 124              		.loc 1 30 1 is_stmt 0 view .LVU15
+ 125 0008 10B4     		push	{r4}
+ 126              	.LCFI1:
+ 127              		.cfi_def_cfa_offset 4
+ 128              		.cfi_offset 4, -4
+ 129              		.loc 1 33 5 view .LVU16
+ 130 000a B1F5007F 		cmp	r1, #512
+ 131 000e 09D9     		bls	.L26
+ 132 0010 A1F20121 		subw	r1, r1, #513
+ 133              	.LVL5:
+ 134              		.loc 1 33 5 view .LVU17
+ 135 0014 0729     		cmp	r1, #7
+ 136 0016 3CD8     		bhi	.L5
+ 137 0018 DFE801F0 		tbb	[pc, r1]
+ 138              	.L12:
+ 139 001c 3D       		.byte	(.L15-.L12)/2
+ 140 001d 49       		.byte	(.L14-.L12)/2
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 4
+
+
+ 141 001e 3B       		.byte	(.L5-.L12)/2
+ 142 001f 3B       		.byte	(.L5-.L12)/2
+ 143 0020 3B       		.byte	(.L5-.L12)/2
+ 144 0021 3B       		.byte	(.L5-.L12)/2
+ 145 0022 54       		.byte	(.L13-.L12)/2
+ 146 0023 5F       		.byte	(.L11-.L12)/2
+ 147              	.LVL6:
+ 148              		.p2align 1
+ 149              	.L26:
+ 150              		.loc 1 33 5 view .LVU18
+ 151 0024 0129     		cmp	r1, #1
+ 152 0026 28D0     		beq	.L8
+ 153 0028 0329     		cmp	r1, #3
+ 154 002a 32D1     		bne	.L5
+  34:rm_referee_system/referee.c ****     {
+  35:rm_referee_system/referee.c ****         /* 常规链路 */
+  36:rm_referee_system/referee.c ****     case GAME_STATUS_CMD_ID: {
+  37:rm_referee_system/referee.c ****         memcpy(&game_status, frame + index, sizeof(game_status_t));
+  38:rm_referee_system/referee.c ****         break;
+  39:rm_referee_system/referee.c ****     }
+  40:rm_referee_system/referee.c ****     case GAME_ROBOT_HP_CMD_ID: {
+  41:rm_referee_system/referee.c ****         memcpy(&game_robot_HP, frame + index, sizeof(game_robot_HP_t));
+ 155              		.loc 1 41 9 is_stmt 1 view .LVU19
+ 156 002c 454C     		ldr	r4, .L28
+ 157 002e D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 158              	.LVL7:
+ 159              		.loc 1 41 9 is_stmt 0 view .LVU20
+ 160 0032 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 161              	.LVL8:
+ 162              		.loc 1 41 9 view .LVU21
+ 163 0036 DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 164 003a DCF81330 		ldr	r3, [ip, #19]	@ unaligned
+ 165 003e 0FC4     		stmia	r4!, {r0, r1, r2, r3}
+ 166 0040 DCF81700 		ldr	r0, [ip, #23]	@ unaligned
+ 167 0044 DCF81B10 		ldr	r1, [ip, #27]	@ unaligned
+ 168 0048 DCF81F20 		ldr	r2, [ip, #31]	@ unaligned
+ 169 004c DCF82330 		ldr	r3, [ip, #35]	@ unaligned
+ 170 0050 0FC4     		stmia	r4!, {r0, r1, r2, r3}
+  42:rm_referee_system/referee.c ****         break;
+ 171              		.loc 1 42 9 is_stmt 1 view .LVU22
+ 172 0052 1EE0     		b	.L5
+ 173              	.LVL9:
+ 174              	.L6:
+ 175              	.LCFI2:
+ 176              		.cfi_def_cfa_offset 0
+ 177              		.cfi_restore 4
+  33:rm_referee_system/referee.c ****     {
+ 178              		.loc 1 33 5 is_stmt 0 view .LVU23
+ 179 0054 40F20233 		movw	r3, #770
+ 180 0058 9942     		cmp	r1, r3
+ 181 005a 68D0     		beq	.L20
+ 182 005c B1F5417F 		cmp	r1, #772
+ 183 0060 67D0     		beq	.L17
+ 184 0062 40F20133 		movw	r3, #769
+ 185 0066 9942     		cmp	r1, r3
+ 186 0068 06D1     		bne	.L27
+  43:rm_referee_system/referee.c ****     }
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 5
+
+
+  44:rm_referee_system/referee.c ****     case ROBOT_STATUS_CMD_ID: {
+  45:rm_referee_system/referee.c ****         memcpy(&robot_status, frame + index, sizeof(robot_status_t));
+  46:rm_referee_system/referee.c ****         break;
+  47:rm_referee_system/referee.c ****     }
+  48:rm_referee_system/referee.c ****     case POWER_HEAT_DATA_CMD_ID: {
+  49:rm_referee_system/referee.c ****         memcpy(&power_heat_data, frame + index, sizeof(power_heat_data_t));
+  50:rm_referee_system/referee.c ****         break;
+  51:rm_referee_system/referee.c ****     }
+  52:rm_referee_system/referee.c ****     case SHOOT_DATA_CMD_ID: {
+  53:rm_referee_system/referee.c ****         memcpy(&shoot_data, frame + index, sizeof(shoot_data_t));
+  54:rm_referee_system/referee.c ****         break;
+  55:rm_referee_system/referee.c ****     }
+  56:rm_referee_system/referee.c ****     case PROJECTILE_ALLOWANCE_CMD_ID: {
+  57:rm_referee_system/referee.c ****         memcpy(&projectile_allowance, frame + index, sizeof(projectile_allowance_t));
+  58:rm_referee_system/referee.c ****         break;
+  59:rm_referee_system/referee.c ****     }
+  60:rm_referee_system/referee.c **** 
+  61:rm_referee_system/referee.c ****     case ROBOT_INTERACTION_DATA_CMD_ID: {
+  62:rm_referee_system/referee.c ****         memcpy(robot_interaction_message_data, frame + index, 8u);
+ 187              		.loc 1 62 9 is_stmt 1 view .LVU24
+ 188 006a 374B     		ldr	r3, .L28+4
+ 189 006c D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 190              	.LVL10:
+ 191              		.loc 1 62 9 is_stmt 0 view .LVU25
+ 192 0070 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 193              	.LVL11:
+ 194              		.loc 1 62 9 view .LVU26
+ 195 0074 03C3     		stmia	r3!, {r0, r1}
+  63:rm_referee_system/referee.c ****         break;
+ 196              		.loc 1 63 9 is_stmt 1 view .LVU27
+ 197 0076 7047     		bx	lr
+ 198              	.LVL12:
+ 199              	.L27:
+ 200              		.loc 1 63 9 is_stmt 0 view .LVU28
+ 201 0078 7047     		bx	lr
+ 202              	.L8:
+ 203              	.LCFI3:
+ 204              		.cfi_def_cfa_offset 4
+ 205              		.cfi_offset 4, -4
+  37:rm_referee_system/referee.c ****         break;
+ 206              		.loc 1 37 9 is_stmt 1 view .LVU29
+ 207 007a 344B     		ldr	r3, .L28+8
+ 208 007c D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 209              	.LVL13:
+  37:rm_referee_system/referee.c ****         break;
+ 210              		.loc 1 37 9 is_stmt 0 view .LVU30
+ 211 0080 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 212              	.LVL14:
+  37:rm_referee_system/referee.c ****         break;
+ 213              		.loc 1 37 9 view .LVU31
+ 214 0084 03C3     		stmia	r3!, {r0, r1}
+ 215 0086 BCF80F10 		ldrh	r1, [ip, #15]	@ unaligned
+ 216 008a 9CF81120 		ldrb	r2, [ip, #17]	@ zero_extendqisi2
+ 217 008e 1980     		strh	r1, [r3]	@ unaligned
+ 218 0090 9A70     		strb	r2, [r3, #2]
+  38:rm_referee_system/referee.c ****     }
+ 219              		.loc 1 38 9 is_stmt 1 view .LVU32
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 6
+
+
+ 220              	.L5:
+  64:rm_referee_system/referee.c ****     }
+  65:rm_referee_system/referee.c **** 
+  66:rm_referee_system/referee.c ****         /* 图传链路 */
+  67:rm_referee_system/referee.c **** 
+  68:rm_referee_system/referee.c ****     case CUSTOM_ROBOT_DATA_CMD_ID: {
+  69:rm_referee_system/referee.c ****         uint32_t temp;
+  70:rm_referee_system/referee.c ****         float temp_out;
+  71:rm_referee_system/referee.c ****         for (uint8_t i = 0; i < 6; i++)
+  72:rm_referee_system/referee.c ****         {
+  73:rm_referee_system/referee.c ****             temp = ((frame[index + 3U + sizeof(float) * i] << 24) | (frame[index + 2U + sizeof(floa
+  74:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+  75:rm_referee_system/referee.c ****             temp_out = *(float *)&temp;
+  76:rm_referee_system/referee.c ****             customer_controller_data.pose[i] = temp_out;
+  77:rm_referee_system/referee.c ****         }
+  78:rm_referee_system/referee.c ****         customer_controller_data.key = frame[index + sizeof(float) * 6];
+  79:rm_referee_system/referee.c ****         break;
+  80:rm_referee_system/referee.c ****     }
+  81:rm_referee_system/referee.c ****     case REMOTE_CONTROL_CMD_ID: {
+  82:rm_referee_system/referee.c ****         memcpy(&vt_link_remote_control, frame + index, sizeof(vt_link_remote_control_t));
+  83:rm_referee_system/referee.c ****         break;
+  84:rm_referee_system/referee.c ****     }
+  85:rm_referee_system/referee.c **** 
+  86:rm_referee_system/referee.c ****     default:
+  87:rm_referee_system/referee.c ****         break;
+  88:rm_referee_system/referee.c ****     }
+  89:rm_referee_system/referee.c **** }
+ 221              		.loc 1 89 1 is_stmt 0 view .LVU33
+ 222 0092 10BC     		pop	{r4}
+ 223              	.LCFI4:
+ 224              		.cfi_remember_state
+ 225              		.cfi_restore 4
+ 226              		.cfi_def_cfa_offset 0
+ 227 0094 7047     		bx	lr
+ 228              	.LVL15:
+ 229              	.L15:
+ 230              	.LCFI5:
+ 231              		.cfi_restore_state
+  45:rm_referee_system/referee.c ****         break;
+ 232              		.loc 1 45 9 is_stmt 1 view .LVU34
+ 233 0096 2E4B     		ldr	r3, .L28+12
+ 234 0098 D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 235              	.LVL16:
+  45:rm_referee_system/referee.c ****         break;
+ 236              		.loc 1 45 9 is_stmt 0 view .LVU35
+ 237 009c DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 238 00a0 DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 239 00a4 07C3     		stmia	r3!, {r0, r1, r2}
+ 240 00a6 9CF81320 		ldrb	r2, [ip, #19]	@ zero_extendqisi2
+ 241 00aa 1A70     		strb	r2, [r3]
+  46:rm_referee_system/referee.c ****     }
+ 242              		.loc 1 46 9 is_stmt 1 view .LVU36
+ 243 00ac F1E7     		b	.L5
+ 244              	.LVL17:
+ 245              	.L14:
+  49:rm_referee_system/referee.c ****         break;
+ 246              		.loc 1 49 9 view .LVU37
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 7
+
+
+ 247 00ae 294C     		ldr	r4, .L28+16
+ 248 00b0 D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 249              	.LVL18:
+  49:rm_referee_system/referee.c ****         break;
+ 250              		.loc 1 49 9 is_stmt 0 view .LVU38
+ 251 00b4 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 252 00b8 DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 253 00bc DCF81330 		ldr	r3, [ip, #19]	@ unaligned
+ 254 00c0 0FC4     		stmia	r4!, {r0, r1, r2, r3}
+  50:rm_referee_system/referee.c ****     }
+ 255              		.loc 1 50 9 is_stmt 1 view .LVU39
+ 256 00c2 E6E7     		b	.L5
+ 257              	.LVL19:
+ 258              	.L13:
+  53:rm_referee_system/referee.c ****         break;
+ 259              		.loc 1 53 9 view .LVU40
+ 260 00c4 244B     		ldr	r3, .L28+20
+ 261 00c6 D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 262              	.LVL20:
+  53:rm_referee_system/referee.c ****         break;
+ 263              		.loc 1 53 9 is_stmt 0 view .LVU41
+ 264 00ca 1860     		str	r0, [r3]
+ 265 00cc BCF80B10 		ldrh	r1, [ip, #11]	@ unaligned
+ 266 00d0 9CF80D20 		ldrb	r2, [ip, #13]	@ zero_extendqisi2
+ 267 00d4 9980     		strh	r1, [r3, #4]	@ unaligned
+ 268 00d6 9A71     		strb	r2, [r3, #6]
+  54:rm_referee_system/referee.c ****     }
+ 269              		.loc 1 54 9 is_stmt 1 view .LVU42
+ 270 00d8 DBE7     		b	.L5
+ 271              	.LVL21:
+ 272              	.L11:
+  57:rm_referee_system/referee.c ****         break;
+ 273              		.loc 1 57 9 view .LVU43
+ 274 00da 204B     		ldr	r3, .L28+24
+ 275 00dc D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 276              	.LVL22:
+  57:rm_referee_system/referee.c ****         break;
+ 277              		.loc 1 57 9 is_stmt 0 view .LVU44
+ 278 00e0 1860     		str	r0, [r3]
+ 279 00e2 BCF80B20 		ldrh	r2, [ip, #11]	@ unaligned
+ 280 00e6 9A80     		strh	r2, [r3, #4]	@ unaligned
+  58:rm_referee_system/referee.c ****     }
+ 281              		.loc 1 58 9 is_stmt 1 view .LVU45
+ 282 00e8 D3E7     		b	.L5
+ 283              	.LVL23:
+ 284              	.L19:
+ 285              	.LCFI6:
+ 286              		.cfi_def_cfa_offset 0
+ 287              		.cfi_restore 4
+ 288              	.LBB2:
+ 289              	.LBB3:
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 290              		.loc 1 73 13 view .LVU46
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 291              		.loc 1 73 55 is_stmt 0 view .LVU47
+ 292 00ea 9100     		lsls	r1, r2, #2
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 8
+
+
+ 293              		.loc 1 73 39 view .LVU48
+ 294 00ec 01F10A03 		add	r3, r1, #10
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 295              		.loc 1 73 27 view .LVU49
+ 296 00f0 1CF80300 		ldrb	r0, [ip, r3]	@ zero_extendqisi2
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 297              		.loc 1 73 87 view .LVU50
+ 298 00f4 01F10903 		add	r3, r1, #9
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 299              		.loc 1 73 75 view .LVU51
+ 300 00f8 1CF80330 		ldrb	r3, [ip, r3]	@ zero_extendqisi2
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 301              		.loc 1 73 108 view .LVU52
+ 302 00fc 1B04     		lsls	r3, r3, #16
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 303              		.loc 1 73 67 view .LVU53
+ 304 00fe 43EA0063 		orr	r3, r3, r0, lsl #24
+  74:rm_referee_system/referee.c ****             temp_out = *(float *)&temp;
+ 305              		.loc 1 74 39 view .LVU54
+ 306 0102 01F10800 		add	r0, r1, #8
+  74:rm_referee_system/referee.c ****             temp_out = *(float *)&temp;
+ 307              		.loc 1 74 27 view .LVU55
+ 308 0106 1CF80000 		ldrb	r0, [ip, r0]	@ zero_extendqisi2
+  73:rm_referee_system/referee.c ****                     (frame[index + 1U + sizeof(float) * i] << 8) | frame[index + 0U + sizeof(float)
+ 309              		.loc 1 73 115 view .LVU56
+ 310 010a 43EA0023 		orr	r3, r3, r0, lsl #8
+  74:rm_referee_system/referee.c ****             temp_out = *(float *)&temp;
+ 311              		.loc 1 74 85 view .LVU57
+ 312 010e 0731     		adds	r1, r1, #7
+  74:rm_referee_system/referee.c ****             temp_out = *(float *)&temp;
+ 313              		.loc 1 74 73 view .LVU58
+ 314 0110 1CF80110 		ldrb	r1, [ip, r1]	@ zero_extendqisi2
+ 315              	.LVL24:
+  75:rm_referee_system/referee.c ****             customer_controller_data.pose[i] = temp_out;
+ 316              		.loc 1 75 13 is_stmt 1 view .LVU59
+  75:rm_referee_system/referee.c ****             customer_controller_data.pose[i] = temp_out;
+ 317              		.loc 1 75 22 is_stmt 0 view .LVU60
+ 318 0114 0B43     		orrs	r3, r3, r1
+ 319              	.LVL25:
+  76:rm_referee_system/referee.c ****         }
+ 320              		.loc 1 76 13 is_stmt 1 view .LVU61
+  76:rm_referee_system/referee.c ****         }
+ 321              		.loc 1 76 46 is_stmt 0 view .LVU62
+ 322 0116 1249     		ldr	r1, .L28+28
+ 323 0118 41F82230 		str	r3, [r1, r2, lsl #2]	@ float
+  71:rm_referee_system/referee.c ****         {
+ 324              		.loc 1 71 37 is_stmt 1 discriminator 3 view .LVU63
+ 325 011c 0132     		adds	r2, r2, #1
+ 326              	.LVL26:
+  71:rm_referee_system/referee.c ****         {
+ 327              		.loc 1 71 37 is_stmt 0 discriminator 3 view .LVU64
+ 328 011e D2B2     		uxtb	r2, r2
+ 329              	.LVL27:
+ 330              	.L16:
+  71:rm_referee_system/referee.c ****         {
+ 331              		.loc 1 71 31 is_stmt 1 discriminator 1 view .LVU65
+ 332 0120 052A     		cmp	r2, #5
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 9
+
+
+ 333 0122 E2D9     		bls	.L19
+ 334              	.LBE3:
+  78:rm_referee_system/referee.c ****         break;
+ 335              		.loc 1 78 9 view .LVU66
+  78:rm_referee_system/referee.c ****         break;
+ 336              		.loc 1 78 45 is_stmt 0 view .LVU67
+ 337 0124 9CF81F20 		ldrb	r2, [ip, #31]	@ zero_extendqisi2
+ 338              	.LVL28:
+  78:rm_referee_system/referee.c ****         break;
+ 339              		.loc 1 78 38 view .LVU68
+ 340 0128 0D4B     		ldr	r3, .L28+28
+ 341 012a 1A76     		strb	r2, [r3, #24]
+  79:rm_referee_system/referee.c ****     }
+ 342              		.loc 1 79 9 is_stmt 1 view .LVU69
+ 343 012c 7047     		bx	lr
+ 344              	.LVL29:
+ 345              	.L20:
+  79:rm_referee_system/referee.c ****     }
+ 346              		.loc 1 79 9 is_stmt 0 view .LVU70
+ 347              	.LBE2:
+  33:rm_referee_system/referee.c ****     {
+ 348              		.loc 1 33 5 view .LVU71
+ 349 012e 0022     		movs	r2, #0
+ 350 0130 F6E7     		b	.L16
+ 351              	.L17:
+  82:rm_referee_system/referee.c ****         break;
+ 352              		.loc 1 82 9 is_stmt 1 view .LVU72
+ 353 0132 0C4B     		ldr	r3, .L28+32
+ 354 0134 D0F80700 		ldr	r0, [r0, #7]	@ unaligned
+ 355              	.LVL30:
+  82:rm_referee_system/referee.c ****         break;
+ 356              		.loc 1 82 9 is_stmt 0 view .LVU73
+ 357 0138 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 358              	.LVL31:
+  82:rm_referee_system/referee.c ****         break;
+ 359              		.loc 1 82 9 view .LVU74
+ 360 013c DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 361 0140 07C3     		stmia	r3!, {r0, r1, r2}
+  83:rm_referee_system/referee.c ****     }
+ 362              		.loc 1 83 9 is_stmt 1 view .LVU75
+ 363 0142 7047     		bx	lr
+ 364              	.L29:
+ 365              		.align	2
+ 366              	.L28:
+ 367 0144 00000000 		.word	game_robot_HP
+ 368 0148 00000000 		.word	robot_interaction_message_data
+ 369 014c 00000000 		.word	game_status
+ 370 0150 00000000 		.word	robot_status
+ 371 0154 00000000 		.word	power_heat_data
+ 372 0158 00000000 		.word	shoot_data
+ 373 015c 00000000 		.word	projectile_allowance
+ 374 0160 00000000 		.word	customer_controller_data
+ 375 0164 00000000 		.word	vt_link_remote_control
+ 376              		.cfi_endproc
+ 377              	.LFE4:
+ 379              		.section	.text.getGameStatus,"ax",%progbits
+ 380              		.align	1
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 10
+
+
+ 381              		.global	getGameStatus
+ 382              		.syntax unified
+ 383              		.thumb
+ 384              		.thumb_func
+ 386              	getGameStatus:
+ 387              	.LFB5:
+  90:rm_referee_system/referee.c **** 
+  91:rm_referee_system/referee.c **** const game_status_t *getGameStatus(void)
+  92:rm_referee_system/referee.c **** {
+ 388              		.loc 1 92 1 view -0
+ 389              		.cfi_startproc
+ 390              		@ args = 0, pretend = 0, frame = 0
+ 391              		@ frame_needed = 0, uses_anonymous_args = 0
+ 392              		@ link register save eliminated.
+  93:rm_referee_system/referee.c ****     return &game_status;
+ 393              		.loc 1 93 5 view .LVU77
+  94:rm_referee_system/referee.c **** }
+ 394              		.loc 1 94 1 is_stmt 0 view .LVU78
+ 395 0000 0048     		ldr	r0, .L31
+ 396 0002 7047     		bx	lr
+ 397              	.L32:
+ 398              		.align	2
+ 399              	.L31:
+ 400 0004 00000000 		.word	game_status
+ 401              		.cfi_endproc
+ 402              	.LFE5:
+ 404              		.section	.text.getRobotHp,"ax",%progbits
+ 405              		.align	1
+ 406              		.global	getRobotHp
+ 407              		.syntax unified
+ 408              		.thumb
+ 409              		.thumb_func
+ 411              	getRobotHp:
+ 412              	.LFB6:
+  95:rm_referee_system/referee.c **** 
+  96:rm_referee_system/referee.c **** const game_robot_HP_t *getRobotHp(void)
+  97:rm_referee_system/referee.c **** {
+ 413              		.loc 1 97 1 is_stmt 1 view -0
+ 414              		.cfi_startproc
+ 415              		@ args = 0, pretend = 0, frame = 0
+ 416              		@ frame_needed = 0, uses_anonymous_args = 0
+ 417              		@ link register save eliminated.
+  98:rm_referee_system/referee.c ****     return &game_robot_HP;
+ 418              		.loc 1 98 5 view .LVU80
+  99:rm_referee_system/referee.c **** }
+ 419              		.loc 1 99 1 is_stmt 0 view .LVU81
+ 420 0000 0048     		ldr	r0, .L34
+ 421 0002 7047     		bx	lr
+ 422              	.L35:
+ 423              		.align	2
+ 424              	.L34:
+ 425 0004 00000000 		.word	game_robot_HP
+ 426              		.cfi_endproc
+ 427              	.LFE6:
+ 429              		.section	.text.getRobotStatus,"ax",%progbits
+ 430              		.align	1
+ 431              		.global	getRobotStatus
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 11
+
+
+ 432              		.syntax unified
+ 433              		.thumb
+ 434              		.thumb_func
+ 436              	getRobotStatus:
+ 437              	.LFB7:
+ 100:rm_referee_system/referee.c **** 
+ 101:rm_referee_system/referee.c **** const robot_status_t *getRobotStatus(void)
+ 102:rm_referee_system/referee.c **** {
+ 438              		.loc 1 102 1 is_stmt 1 view -0
+ 439              		.cfi_startproc
+ 440              		@ args = 0, pretend = 0, frame = 0
+ 441              		@ frame_needed = 0, uses_anonymous_args = 0
+ 442              		@ link register save eliminated.
+ 103:rm_referee_system/referee.c ****     return &robot_status;
+ 443              		.loc 1 103 5 view .LVU83
+ 104:rm_referee_system/referee.c **** }
+ 444              		.loc 1 104 1 is_stmt 0 view .LVU84
+ 445 0000 0048     		ldr	r0, .L37
+ 446 0002 7047     		bx	lr
+ 447              	.L38:
+ 448              		.align	2
+ 449              	.L37:
+ 450 0004 00000000 		.word	robot_status
+ 451              		.cfi_endproc
+ 452              	.LFE7:
+ 454              		.section	.text.getRobotStatusId,"ax",%progbits
+ 455              		.align	1
+ 456              		.global	getRobotStatusId
+ 457              		.syntax unified
+ 458              		.thumb
+ 459              		.thumb_func
+ 461              	getRobotStatusId:
+ 462              	.LFB8:
+ 105:rm_referee_system/referee.c **** 
+ 106:rm_referee_system/referee.c **** uint8_t getRobotStatusId(void)
+ 107:rm_referee_system/referee.c **** {
+ 463              		.loc 1 107 1 is_stmt 1 view -0
+ 464              		.cfi_startproc
+ 465              		@ args = 0, pretend = 0, frame = 0
+ 466              		@ frame_needed = 0, uses_anonymous_args = 0
+ 467              		@ link register save eliminated.
+ 108:rm_referee_system/referee.c ****     return robot_status.robot_id;
+ 468              		.loc 1 108 5 view .LVU86
+ 109:rm_referee_system/referee.c **** }
+ 469              		.loc 1 109 1 is_stmt 0 view .LVU87
+ 470 0000 014B     		ldr	r3, .L40
+ 471 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 472 0004 7047     		bx	lr
+ 473              	.L41:
+ 474 0006 00BF     		.align	2
+ 475              	.L40:
+ 476 0008 00000000 		.word	robot_status
+ 477              		.cfi_endproc
+ 478              	.LFE8:
+ 480              		.section	.text.getRobotCurrentHp,"ax",%progbits
+ 481              		.align	1
+ 482              		.global	getRobotCurrentHp
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 12
+
+
+ 483              		.syntax unified
+ 484              		.thumb
+ 485              		.thumb_func
+ 487              	getRobotCurrentHp:
+ 488              	.LFB9:
+ 110:rm_referee_system/referee.c **** 
+ 111:rm_referee_system/referee.c **** uint16_t getRobotCurrentHp(void)
+ 112:rm_referee_system/referee.c **** {
+ 489              		.loc 1 112 1 is_stmt 1 view -0
+ 490              		.cfi_startproc
+ 491              		@ args = 0, pretend = 0, frame = 0
+ 492              		@ frame_needed = 0, uses_anonymous_args = 0
+ 493              		@ link register save eliminated.
+ 113:rm_referee_system/referee.c ****     return robot_status.current_HP;
+ 494              		.loc 1 113 5 view .LVU89
+ 114:rm_referee_system/referee.c **** }
+ 495              		.loc 1 114 1 is_stmt 0 view .LVU90
+ 496 0000 014B     		ldr	r3, .L43
+ 497 0002 5888     		ldrh	r0, [r3, #2]
+ 498 0004 7047     		bx	lr
+ 499              	.L44:
+ 500 0006 00BF     		.align	2
+ 501              	.L43:
+ 502 0008 00000000 		.word	robot_status
+ 503              		.cfi_endproc
+ 504              	.LFE9:
+ 506              		.section	.text.getPowerHeatData,"ax",%progbits
+ 507              		.align	1
+ 508              		.global	getPowerHeatData
+ 509              		.syntax unified
+ 510              		.thumb
+ 511              		.thumb_func
+ 513              	getPowerHeatData:
+ 514              	.LFB10:
+ 115:rm_referee_system/referee.c **** 
+ 116:rm_referee_system/referee.c **** const power_heat_data_t *getPowerHeatData(void)
+ 117:rm_referee_system/referee.c **** {
+ 515              		.loc 1 117 1 is_stmt 1 view -0
+ 516              		.cfi_startproc
+ 517              		@ args = 0, pretend = 0, frame = 0
+ 518              		@ frame_needed = 0, uses_anonymous_args = 0
+ 519              		@ link register save eliminated.
+ 118:rm_referee_system/referee.c ****     return &power_heat_data;
+ 520              		.loc 1 118 5 view .LVU92
+ 119:rm_referee_system/referee.c **** }
+ 521              		.loc 1 119 1 is_stmt 0 view .LVU93
+ 522 0000 0048     		ldr	r0, .L46
+ 523 0002 7047     		bx	lr
+ 524              	.L47:
+ 525              		.align	2
+ 526              	.L46:
+ 527 0004 00000000 		.word	power_heat_data
+ 528              		.cfi_endproc
+ 529              	.LFE10:
+ 531              		.section	.text.getShootData,"ax",%progbits
+ 532              		.align	1
+ 533              		.global	getShootData
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 13
+
+
+ 534              		.syntax unified
+ 535              		.thumb
+ 536              		.thumb_func
+ 538              	getShootData:
+ 539              	.LFB11:
+ 120:rm_referee_system/referee.c **** 
+ 121:rm_referee_system/referee.c **** const shoot_data_t *getShootData(void)
+ 122:rm_referee_system/referee.c **** {
+ 540              		.loc 1 122 1 is_stmt 1 view -0
+ 541              		.cfi_startproc
+ 542              		@ args = 0, pretend = 0, frame = 0
+ 543              		@ frame_needed = 0, uses_anonymous_args = 0
+ 544              		@ link register save eliminated.
+ 123:rm_referee_system/referee.c ****     return &shoot_data;
+ 545              		.loc 1 123 5 view .LVU95
+ 124:rm_referee_system/referee.c **** }
+ 546              		.loc 1 124 1 is_stmt 0 view .LVU96
+ 547 0000 0048     		ldr	r0, .L49
+ 548 0002 7047     		bx	lr
+ 549              	.L50:
+ 550              		.align	2
+ 551              	.L49:
+ 552 0004 00000000 		.word	shoot_data
+ 553              		.cfi_endproc
+ 554              	.LFE11:
+ 556              		.section	.text.getProjectileAllowance,"ax",%progbits
+ 557              		.align	1
+ 558              		.global	getProjectileAllowance
+ 559              		.syntax unified
+ 560              		.thumb
+ 561              		.thumb_func
+ 563              	getProjectileAllowance:
+ 564              	.LFB12:
+ 125:rm_referee_system/referee.c **** 
+ 126:rm_referee_system/referee.c **** const projectile_allowance_t *getProjectileAllowance(void)
+ 127:rm_referee_system/referee.c **** {
+ 565              		.loc 1 127 1 is_stmt 1 view -0
+ 566              		.cfi_startproc
+ 567              		@ args = 0, pretend = 0, frame = 0
+ 568              		@ frame_needed = 0, uses_anonymous_args = 0
+ 569              		@ link register save eliminated.
+ 128:rm_referee_system/referee.c ****     return &projectile_allowance;
+ 570              		.loc 1 128 5 view .LVU98
+ 129:rm_referee_system/referee.c **** }
+ 571              		.loc 1 129 1 is_stmt 0 view .LVU99
+ 572 0000 0048     		ldr	r0, .L52
+ 573 0002 7047     		bx	lr
+ 574              	.L53:
+ 575              		.align	2
+ 576              	.L52:
+ 577 0004 00000000 		.word	projectile_allowance
+ 578              		.cfi_endproc
+ 579              	.LFE12:
+ 581              		.section	.text.getRobotInteractionMessageData,"ax",%progbits
+ 582              		.align	1
+ 583              		.global	getRobotInteractionMessageData
+ 584              		.syntax unified
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 14
+
+
+ 585              		.thumb
+ 586              		.thumb_func
+ 588              	getRobotInteractionMessageData:
+ 589              	.LFB13:
+ 130:rm_referee_system/referee.c **** 
+ 131:rm_referee_system/referee.c **** const uint8_t *getRobotInteractionMessageData(void)
+ 132:rm_referee_system/referee.c **** {
+ 590              		.loc 1 132 1 is_stmt 1 view -0
+ 591              		.cfi_startproc
+ 592              		@ args = 0, pretend = 0, frame = 0
+ 593              		@ frame_needed = 0, uses_anonymous_args = 0
+ 594              		@ link register save eliminated.
+ 133:rm_referee_system/referee.c ****     return robot_interaction_message_data;
+ 595              		.loc 1 133 5 view .LVU101
+ 134:rm_referee_system/referee.c **** }
+ 596              		.loc 1 134 1 is_stmt 0 view .LVU102
+ 597 0000 0048     		ldr	r0, .L55
+ 598 0002 7047     		bx	lr
+ 599              	.L56:
+ 600              		.align	2
+ 601              	.L55:
+ 602 0004 00000000 		.word	robot_interaction_message_data
+ 603              		.cfi_endproc
+ 604              	.LFE13:
+ 606              		.section	.text.getCustomerControllerData,"ax",%progbits
+ 607              		.align	1
+ 608              		.global	getCustomerControllerData
+ 609              		.syntax unified
+ 610              		.thumb
+ 611              		.thumb_func
+ 613              	getCustomerControllerData:
+ 614              	.LFB14:
+ 135:rm_referee_system/referee.c **** 
+ 136:rm_referee_system/referee.c **** const custom_robot_data_t *getCustomerControllerData(void)
+ 137:rm_referee_system/referee.c **** {
+ 615              		.loc 1 137 1 is_stmt 1 view -0
+ 616              		.cfi_startproc
+ 617              		@ args = 0, pretend = 0, frame = 0
+ 618              		@ frame_needed = 0, uses_anonymous_args = 0
+ 619              		@ link register save eliminated.
+ 138:rm_referee_system/referee.c ****     return &customer_controller_data;
+ 620              		.loc 1 138 5 view .LVU104
+ 139:rm_referee_system/referee.c **** }
+ 621              		.loc 1 139 1 is_stmt 0 view .LVU105
+ 622 0000 0048     		ldr	r0, .L58
+ 623 0002 7047     		bx	lr
+ 624              	.L59:
+ 625              		.align	2
+ 626              	.L58:
+ 627 0004 00000000 		.word	customer_controller_data
+ 628              		.cfi_endproc
+ 629              	.LFE14:
+ 631              		.section	.text.getVtLinkRemoteControlData,"ax",%progbits
+ 632              		.align	1
+ 633              		.global	getVtLinkRemoteControlData
+ 634              		.syntax unified
+ 635              		.thumb
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 15
+
+
+ 636              		.thumb_func
+ 638              	getVtLinkRemoteControlData:
+ 639              	.LFB15:
+ 140:rm_referee_system/referee.c **** 
+ 141:rm_referee_system/referee.c **** const vt_link_remote_control_t *getVtLinkRemoteControlData(void)
+ 142:rm_referee_system/referee.c **** {
+ 640              		.loc 1 142 1 is_stmt 1 view -0
+ 641              		.cfi_startproc
+ 642              		@ args = 0, pretend = 0, frame = 0
+ 643              		@ frame_needed = 0, uses_anonymous_args = 0
+ 644              		@ link register save eliminated.
+ 143:rm_referee_system/referee.c ****     return &vt_link_remote_control;
+ 645              		.loc 1 143 5 view .LVU107
+ 144:rm_referee_system/referee.c **** }
+ 646              		.loc 1 144 1 is_stmt 0 view .LVU108
+ 647 0000 0048     		ldr	r0, .L61
+ 648 0002 7047     		bx	lr
+ 649              	.L62:
+ 650              		.align	2
+ 651              	.L61:
+ 652 0004 00000000 		.word	vt_link_remote_control
+ 653              		.cfi_endproc
+ 654              	.LFE15:
+ 656              		.section	.bss.vt_link_remote_control,"aw",%nobits
+ 657              		.align	2
+ 660              	vt_link_remote_control:
+ 661 0000 00000000 		.space	12
+ 661      00000000 
+ 661      00000000 
+ 662              		.section	.bss.customer_controller_data,"aw",%nobits
+ 663              		.align	2
+ 666              	customer_controller_data:
+ 667 0000 00000000 		.space	30
+ 667      00000000 
+ 667      00000000 
+ 667      00000000 
+ 667      00000000 
+ 668              		.section	.bss.robot_interaction_message_data,"aw",%nobits
+ 669              		.align	2
+ 672              	robot_interaction_message_data:
+ 673 0000 00000000 		.space	118
+ 673      00000000 
+ 673      00000000 
+ 673      00000000 
+ 673      00000000 
+ 674              		.section	.bss.projectile_allowance,"aw",%nobits
+ 675              		.align	2
+ 678              	projectile_allowance:
+ 679 0000 00000000 		.space	6
+ 679      0000
+ 680              		.section	.bss.shoot_data,"aw",%nobits
+ 681              		.align	2
+ 684              	shoot_data:
+ 685 0000 00000000 		.space	7
+ 685      000000
+ 686              		.section	.bss.power_heat_data,"aw",%nobits
+ 687              		.align	2
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 16
+
+
+ 690              	power_heat_data:
+ 691 0000 00000000 		.space	16
+ 691      00000000 
+ 691      00000000 
+ 691      00000000 
+ 692              		.section	.bss.robot_status,"aw",%nobits
+ 693              		.align	2
+ 696              	robot_status:
+ 697 0000 00000000 		.space	13
+ 697      00000000 
+ 697      00000000 
+ 697      00
+ 698              		.section	.bss.game_robot_HP,"aw",%nobits
+ 699              		.align	2
+ 702              	game_robot_HP:
+ 703 0000 00000000 		.space	32
+ 703      00000000 
+ 703      00000000 
+ 703      00000000 
+ 703      00000000 
+ 704              		.section	.bss.game_status,"aw",%nobits
+ 705              		.align	2
+ 708              	game_status:
+ 709 0000 00000000 		.space	11
+ 709      00000000 
+ 709      000000
+ 710              		.text
+ 711              	.Letext0:
+ 712              		.file 2 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 713              		.file 3 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/inc
+ 714              		.file 4 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 715              		.file 5 "rm_referee_system/referee_protocol.h"
+ 716              		.file 6 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 717              		.file 7 "<built-in>"
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 17
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 referee.c
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:19     .text.refereeInitData:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:25     .text.refereeInitData:00000000 refereeInitData
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:90     .text.refereeInitData:00000058 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:708    .bss.game_status:00000000 game_status
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:702    .bss.game_robot_HP:00000000 game_robot_HP
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:696    .bss.robot_status:00000000 robot_status
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:690    .bss.power_heat_data:00000000 power_heat_data
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:684    .bss.shoot_data:00000000 shoot_data
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:678    .bss.projectile_allowance:00000000 projectile_allowance
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:672    .bss.robot_interaction_message_data:00000000 robot_interaction_message_data
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:666    .bss.customer_controller_data:00000000 customer_controller_data
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:660    .bss.vt_link_remote_control:00000000 vt_link_remote_control
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:103    .text.referee_data_decode:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:109    .text.referee_data_decode:00000000 referee_data_decode
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:139    .text.referee_data_decode:0000001c $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:148    .text.referee_data_decode:00000024 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:367    .text.referee_data_decode:00000144 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:380    .text.getGameStatus:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:386    .text.getGameStatus:00000000 getGameStatus
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:400    .text.getGameStatus:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:405    .text.getRobotHp:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:411    .text.getRobotHp:00000000 getRobotHp
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:425    .text.getRobotHp:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:430    .text.getRobotStatus:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:436    .text.getRobotStatus:00000000 getRobotStatus
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:450    .text.getRobotStatus:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:455    .text.getRobotStatusId:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:461    .text.getRobotStatusId:00000000 getRobotStatusId
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:476    .text.getRobotStatusId:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:481    .text.getRobotCurrentHp:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:487    .text.getRobotCurrentHp:00000000 getRobotCurrentHp
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:502    .text.getRobotCurrentHp:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:507    .text.getPowerHeatData:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:513    .text.getPowerHeatData:00000000 getPowerHeatData
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:527    .text.getPowerHeatData:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:532    .text.getShootData:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:538    .text.getShootData:00000000 getShootData
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:552    .text.getShootData:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:557    .text.getProjectileAllowance:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:563    .text.getProjectileAllowance:00000000 getProjectileAllowance
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:577    .text.getProjectileAllowance:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:582    .text.getRobotInteractionMessageData:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:588    .text.getRobotInteractionMessageData:00000000 getRobotInteractionMessageData
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:602    .text.getRobotInteractionMessageData:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:607    .text.getCustomerControllerData:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:613    .text.getCustomerControllerData:00000000 getCustomerControllerData
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:627    .text.getCustomerControllerData:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:632    .text.getVtLinkRemoteControlData:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:638    .text.getVtLinkRemoteControlData:00000000 getVtLinkRemoteControlData
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:652    .text.getVtLinkRemoteControlData:00000004 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:657    .bss.vt_link_remote_control:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:663    .bss.customer_controller_data:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:669    .bss.robot_interaction_message_data:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:675    .bss.projectile_allowance:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:681    .bss.shoot_data:00000000 $d
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cclsPBik.s 			page 18
+
+
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:687    .bss.power_heat_data:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:693    .bss.robot_status:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:699    .bss.game_robot_HP:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cclsPBik.s:705    .bss.game_status:00000000 $d
+
+UNDEFINED SYMBOLS
+memset

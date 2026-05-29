@@ -1,0 +1,412 @@
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"app_ec11.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "App/app_ec11.c"
+  18              		.section	.text.appEc11Init,"ax",%progbits
+  19              		.align	1
+  20              		.global	appEc11Init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	appEc11Init:
+  26              	.LFB65:
+   1:App/app_ec11.c **** #include "app_ec11.h"
+   2:App/app_ec11.c **** #include "bsp_ec11.h"
+   3:App/app_ec11.c **** #include "stm32f1xx_hal.h"
+   4:App/app_ec11.c **** 
+   5:App/app_ec11.c **** /* EXTI software debounce threshold in milliseconds */
+   6:App/app_ec11.c **** #define DEBOUNCE_DELAY_MS 2
+   7:App/app_ec11.c **** 
+   8:App/app_ec11.c **** static Ec11Device ec11_dev;
+   9:App/app_ec11.c **** 
+  10:App/app_ec11.c **** void appEc11Init(void) {
+  27              		.loc 1 10 24 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  11:App/app_ec11.c ****     ec11_dev.count_ = 0;
+  32              		.loc 1 11 5 view .LVU1
+  33              		.loc 1 11 21 is_stmt 0 view .LVU2
+  34 0000 024B     		ldr	r3, .L2
+  35 0002 0022     		movs	r2, #0
+  36 0004 1A60     		str	r2, [r3]
+  12:App/app_ec11.c ****     ec11_dev.direction_ = EC11_DIR_NONE;
+  37              		.loc 1 12 5 is_stmt 1 view .LVU3
+  38              		.loc 1 12 25 is_stmt 0 view .LVU4
+  39 0006 1A71     		strb	r2, [r3, #4]
+  13:App/app_ec11.c ****     ec11_dev.button_state_ = EC11_BTN_RELEASED;
+  40              		.loc 1 13 5 is_stmt 1 view .LVU5
+  41              		.loc 1 13 28 is_stmt 0 view .LVU6
+  42 0008 5A71     		strb	r2, [r3, #5]
+  14:App/app_ec11.c **** }
+  43              		.loc 1 14 1 view .LVU7
+  44 000a 7047     		bx	lr
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 2
+
+
+  45              	.L3:
+  46              		.align	2
+  47              	.L2:
+  48 000c 00000000 		.word	ec11_dev
+  49              		.cfi_endproc
+  50              	.LFE65:
+  52              		.section	.text.appEc11ExtiCallback,"ax",%progbits
+  53              		.align	1
+  54              		.global	appEc11ExtiCallback
+  55              		.syntax unified
+  56              		.thumb
+  57              		.thumb_func
+  59              	appEc11ExtiCallback:
+  60              	.LVL0:
+  61              	.LFB66:
+  15:App/app_ec11.c **** 
+  16:App/app_ec11.c **** void appEc11ExtiCallback(uint16_t gpio_pin) {
+  62              		.loc 1 16 45 is_stmt 1 view -0
+  63              		.cfi_startproc
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66              		.loc 1 16 45 is_stmt 0 view .LVU9
+  67 0000 38B5     		push	{r3, r4, r5, lr}
+  68              	.LCFI0:
+  69              		.cfi_def_cfa_offset 16
+  70              		.cfi_offset 3, -16
+  71              		.cfi_offset 4, -12
+  72              		.cfi_offset 5, -8
+  73              		.cfi_offset 14, -4
+  74 0002 0446     		mov	r4, r0
+  17:App/app_ec11.c ****     static uint32_t last_a_trigger = 0;
+  75              		.loc 1 17 5 is_stmt 1 view .LVU10
+  18:App/app_ec11.c ****     static uint32_t last_btn_trigger = 0;
+  76              		.loc 1 18 5 view .LVU11
+  19:App/app_ec11.c ****     uint32_t current_tick = HAL_GetTick();
+  77              		.loc 1 19 5 view .LVU12
+  78              		.loc 1 19 29 is_stmt 0 view .LVU13
+  79 0004 FFF7FEFF 		bl	HAL_GetTick
+  80              	.LVL1:
+  81              		.loc 1 19 29 view .LVU14
+  82 0008 0546     		mov	r5, r0
+  83              	.LVL2:
+  20:App/app_ec11.c **** 
+  21:App/app_ec11.c ****     /* Process encoder rotation */
+  22:App/app_ec11.c ****     if (gpio_pin == EC11_PIN_A) {
+  84              		.loc 1 22 5 is_stmt 1 view .LVU15
+  85              		.loc 1 22 8 is_stmt 0 view .LVU16
+  86 000a 012C     		cmp	r4, #1
+  87 000c 02D0     		beq	.L12
+  23:App/app_ec11.c ****         if ((current_tick - last_a_trigger) > DEBOUNCE_DELAY_MS) {
+  24:App/app_ec11.c ****             if (bspReadEc11PinB()) {
+  25:App/app_ec11.c ****                 ec11_dev.count_++;
+  26:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CW;
+  27:App/app_ec11.c ****             } else {
+  28:App/app_ec11.c ****                 ec11_dev.count_--;
+  29:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CCW;
+  30:App/app_ec11.c ****             }
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 3
+
+
+  31:App/app_ec11.c ****             last_a_trigger = current_tick;
+  32:App/app_ec11.c ****         }
+  33:App/app_ec11.c ****     } 
+  34:App/app_ec11.c ****     /* Process encoder button */
+  35:App/app_ec11.c ****     else if (gpio_pin == EC11_PIN_BTN) {
+  88              		.loc 1 35 10 is_stmt 1 view .LVU17
+  89              		.loc 1 35 13 is_stmt 0 view .LVU18
+  90 000e 042C     		cmp	r4, #4
+  91 0010 18D0     		beq	.L13
+  92              	.LVL3:
+  93              	.L4:
+  36:App/app_ec11.c ****         if ((current_tick - last_btn_trigger) > DEBOUNCE_DELAY_MS) {
+  37:App/app_ec11.c ****             if (bspReadEc11PinBtn()) {
+  38:App/app_ec11.c ****                 ec11_dev.button_state_ = EC11_BTN_RELEASED;
+  39:App/app_ec11.c ****             } else {
+  40:App/app_ec11.c ****                 ec11_dev.button_state_ = EC11_BTN_PRESSED;
+  41:App/app_ec11.c ****             }
+  42:App/app_ec11.c ****             last_btn_trigger = current_tick;
+  43:App/app_ec11.c ****         }
+  44:App/app_ec11.c ****     }
+  45:App/app_ec11.c **** }
+  94              		.loc 1 45 1 view .LVU19
+  95 0012 38BD     		pop	{r3, r4, r5, pc}
+  96              	.LVL4:
+  97              	.L12:
+  23:App/app_ec11.c ****         if ((current_tick - last_a_trigger) > DEBOUNCE_DELAY_MS) {
+  98              		.loc 1 23 9 is_stmt 1 view .LVU20
+  23:App/app_ec11.c ****         if ((current_tick - last_a_trigger) > DEBOUNCE_DELAY_MS) {
+  99              		.loc 1 23 27 is_stmt 0 view .LVU21
+ 100 0014 144B     		ldr	r3, .L14
+ 101 0016 1B68     		ldr	r3, [r3]
+ 102 0018 C31A     		subs	r3, r0, r3
+  23:App/app_ec11.c ****         if ((current_tick - last_a_trigger) > DEBOUNCE_DELAY_MS) {
+ 103              		.loc 1 23 12 view .LVU22
+ 104 001a 022B     		cmp	r3, #2
+ 105 001c F9D9     		bls	.L4
+  24:App/app_ec11.c ****                 ec11_dev.count_++;
+ 106              		.loc 1 24 13 is_stmt 1 view .LVU23
+  24:App/app_ec11.c ****                 ec11_dev.count_++;
+ 107              		.loc 1 24 17 is_stmt 0 view .LVU24
+ 108 001e FFF7FEFF 		bl	bspReadEc11PinB
+ 109              	.LVL5:
+  24:App/app_ec11.c ****                 ec11_dev.count_++;
+ 110              		.loc 1 24 16 discriminator 1 view .LVU25
+ 111 0022 40B1     		cbz	r0, .L7
+  25:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CW;
+ 112              		.loc 1 25 17 is_stmt 1 view .LVU26
+  25:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CW;
+ 113              		.loc 1 25 25 is_stmt 0 view .LVU27
+ 114 0024 114B     		ldr	r3, .L14+4
+ 115 0026 1A68     		ldr	r2, [r3]
+  25:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CW;
+ 116              		.loc 1 25 32 view .LVU28
+ 117 0028 0132     		adds	r2, r2, #1
+ 118 002a 1A60     		str	r2, [r3]
+  26:App/app_ec11.c ****             } else {
+ 119              		.loc 1 26 17 is_stmt 1 view .LVU29
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 4
+
+
+  26:App/app_ec11.c ****             } else {
+ 120              		.loc 1 26 37 is_stmt 0 view .LVU30
+ 121 002c 0122     		movs	r2, #1
+ 122 002e 1A71     		strb	r2, [r3, #4]
+ 123              	.L8:
+  31:App/app_ec11.c ****         }
+ 124              		.loc 1 31 13 is_stmt 1 view .LVU31
+  31:App/app_ec11.c ****         }
+ 125              		.loc 1 31 28 is_stmt 0 view .LVU32
+ 126 0030 0D4B     		ldr	r3, .L14
+ 127 0032 1D60     		str	r5, [r3]
+ 128 0034 EDE7     		b	.L4
+ 129              	.L7:
+  28:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CCW;
+ 130              		.loc 1 28 17 is_stmt 1 view .LVU33
+  28:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CCW;
+ 131              		.loc 1 28 25 is_stmt 0 view .LVU34
+ 132 0036 0D4B     		ldr	r3, .L14+4
+ 133 0038 1A68     		ldr	r2, [r3]
+  28:App/app_ec11.c ****                 ec11_dev.direction_ = EC11_DIR_CCW;
+ 134              		.loc 1 28 32 view .LVU35
+ 135 003a 013A     		subs	r2, r2, #1
+ 136 003c 1A60     		str	r2, [r3]
+  29:App/app_ec11.c ****             }
+ 137              		.loc 1 29 17 is_stmt 1 view .LVU36
+  29:App/app_ec11.c ****             }
+ 138              		.loc 1 29 37 is_stmt 0 view .LVU37
+ 139 003e 0222     		movs	r2, #2
+ 140 0040 1A71     		strb	r2, [r3, #4]
+ 141 0042 F5E7     		b	.L8
+ 142              	.LVL6:
+ 143              	.L13:
+  36:App/app_ec11.c ****             if (bspReadEc11PinBtn()) {
+ 144              		.loc 1 36 9 is_stmt 1 view .LVU38
+  36:App/app_ec11.c ****             if (bspReadEc11PinBtn()) {
+ 145              		.loc 1 36 27 is_stmt 0 view .LVU39
+ 146 0044 0A4B     		ldr	r3, .L14+8
+ 147 0046 1B68     		ldr	r3, [r3]
+ 148 0048 C31A     		subs	r3, r0, r3
+  36:App/app_ec11.c ****             if (bspReadEc11PinBtn()) {
+ 149              		.loc 1 36 12 view .LVU40
+ 150 004a 022B     		cmp	r3, #2
+ 151 004c E1D9     		bls	.L4
+  37:App/app_ec11.c ****                 ec11_dev.button_state_ = EC11_BTN_RELEASED;
+ 152              		.loc 1 37 13 is_stmt 1 view .LVU41
+  37:App/app_ec11.c ****                 ec11_dev.button_state_ = EC11_BTN_RELEASED;
+ 153              		.loc 1 37 17 is_stmt 0 view .LVU42
+ 154 004e FFF7FEFF 		bl	bspReadEc11PinBtn
+ 155              	.LVL7:
+  37:App/app_ec11.c ****                 ec11_dev.button_state_ = EC11_BTN_RELEASED;
+ 156              		.loc 1 37 16 discriminator 1 view .LVU43
+ 157 0052 28B1     		cbz	r0, .L9
+  38:App/app_ec11.c ****             } else {
+ 158              		.loc 1 38 17 is_stmt 1 view .LVU44
+  38:App/app_ec11.c ****             } else {
+ 159              		.loc 1 38 40 is_stmt 0 view .LVU45
+ 160 0054 054B     		ldr	r3, .L14+4
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 5
+
+
+ 161 0056 0022     		movs	r2, #0
+ 162 0058 5A71     		strb	r2, [r3, #5]
+ 163              	.L10:
+  42:App/app_ec11.c ****         }
+ 164              		.loc 1 42 13 is_stmt 1 view .LVU46
+  42:App/app_ec11.c ****         }
+ 165              		.loc 1 42 30 is_stmt 0 view .LVU47
+ 166 005a 054B     		ldr	r3, .L14+8
+ 167 005c 1D60     		str	r5, [r3]
+ 168              		.loc 1 45 1 view .LVU48
+ 169 005e D8E7     		b	.L4
+ 170              	.L9:
+  40:App/app_ec11.c ****             }
+ 171              		.loc 1 40 17 is_stmt 1 view .LVU49
+  40:App/app_ec11.c ****             }
+ 172              		.loc 1 40 40 is_stmt 0 view .LVU50
+ 173 0060 024B     		ldr	r3, .L14+4
+ 174 0062 0122     		movs	r2, #1
+ 175 0064 5A71     		strb	r2, [r3, #5]
+ 176 0066 F8E7     		b	.L10
+ 177              	.L15:
+ 178              		.align	2
+ 179              	.L14:
+ 180 0068 00000000 		.word	last_a_trigger.1
+ 181 006c 00000000 		.word	ec11_dev
+ 182 0070 00000000 		.word	last_btn_trigger.0
+ 183              		.cfi_endproc
+ 184              	.LFE66:
+ 186              		.section	.text.appEc11GetCount,"ax",%progbits
+ 187              		.align	1
+ 188              		.global	appEc11GetCount
+ 189              		.syntax unified
+ 190              		.thumb
+ 191              		.thumb_func
+ 193              	appEc11GetCount:
+ 194              	.LFB67:
+  46:App/app_ec11.c **** 
+  47:App/app_ec11.c **** int32_t appEc11GetCount(void) {
+ 195              		.loc 1 47 31 is_stmt 1 view -0
+ 196              		.cfi_startproc
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199              		@ link register save eliminated.
+  48:App/app_ec11.c ****     return ec11_dev.count_;
+ 200              		.loc 1 48 5 view .LVU52
+  49:App/app_ec11.c **** }
+ 201              		.loc 1 49 1 is_stmt 0 view .LVU53
+ 202 0000 014B     		ldr	r3, .L17
+ 203 0002 1868     		ldr	r0, [r3]
+ 204 0004 7047     		bx	lr
+ 205              	.L18:
+ 206 0006 00BF     		.align	2
+ 207              	.L17:
+ 208 0008 00000000 		.word	ec11_dev
+ 209              		.cfi_endproc
+ 210              	.LFE67:
+ 212              		.section	.text.appEc11GetDirection,"ax",%progbits
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 6
+
+
+ 213              		.align	1
+ 214              		.global	appEc11GetDirection
+ 215              		.syntax unified
+ 216              		.thumb
+ 217              		.thumb_func
+ 219              	appEc11GetDirection:
+ 220              	.LFB68:
+  50:App/app_ec11.c **** 
+  51:App/app_ec11.c **** Ec11Direction appEc11GetDirection(void) {
+ 221              		.loc 1 51 41 is_stmt 1 view -0
+ 222              		.cfi_startproc
+ 223              		@ args = 0, pretend = 0, frame = 0
+ 224              		@ frame_needed = 0, uses_anonymous_args = 0
+ 225              		@ link register save eliminated.
+  52:App/app_ec11.c ****     return ec11_dev.direction_;
+ 226              		.loc 1 52 5 view .LVU55
+  53:App/app_ec11.c **** }
+ 227              		.loc 1 53 1 is_stmt 0 view .LVU56
+ 228 0000 014B     		ldr	r3, .L20
+ 229 0002 1879     		ldrb	r0, [r3, #4]	@ zero_extendqisi2
+ 230 0004 7047     		bx	lr
+ 231              	.L21:
+ 232 0006 00BF     		.align	2
+ 233              	.L20:
+ 234 0008 00000000 		.word	ec11_dev
+ 235              		.cfi_endproc
+ 236              	.LFE68:
+ 238              		.section	.text.appEc11GetButtonState,"ax",%progbits
+ 239              		.align	1
+ 240              		.global	appEc11GetButtonState
+ 241              		.syntax unified
+ 242              		.thumb
+ 243              		.thumb_func
+ 245              	appEc11GetButtonState:
+ 246              	.LFB69:
+  54:App/app_ec11.c **** 
+  55:App/app_ec11.c **** Ec11ButtonState appEc11GetButtonState(void) {
+ 247              		.loc 1 55 45 is_stmt 1 view -0
+ 248              		.cfi_startproc
+ 249              		@ args = 0, pretend = 0, frame = 0
+ 250              		@ frame_needed = 0, uses_anonymous_args = 0
+ 251              		@ link register save eliminated.
+  56:App/app_ec11.c ****     return ec11_dev.button_state_;
+ 252              		.loc 1 56 5 view .LVU58
+  57:App/app_ec11.c **** }...
+ 253              		.loc 1 57 1 is_stmt 0 view .LVU59
+ 254 0000 014B     		ldr	r3, .L23
+ 255 0002 5879     		ldrb	r0, [r3, #5]	@ zero_extendqisi2
+ 256 0004 7047     		bx	lr
+ 257              	.L24:
+ 258 0006 00BF     		.align	2
+ 259              	.L23:
+ 260 0008 00000000 		.word	ec11_dev
+ 261              		.cfi_endproc
+ 262              	.LFE69:
+ 264              		.section	.bss.last_btn_trigger.0,"aw",%nobits
+ 265              		.align	2
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 7
+
+
+ 268              	last_btn_trigger.0:
+ 269 0000 00000000 		.space	4
+ 270              		.section	.bss.last_a_trigger.1,"aw",%nobits
+ 271              		.align	2
+ 274              	last_a_trigger.1:
+ 275 0000 00000000 		.space	4
+ 276              		.section	.bss.ec11_dev,"aw",%nobits
+ 277              		.align	2
+ 280              	ec11_dev:
+ 281 0000 00000000 		.space	8
+ 281      00000000 
+ 282              		.text
+ 283              	.Letext0:
+ 284              		.file 2 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 285              		.file 3 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 286              		.file 4 "App/app_ec11.h"
+ 287              		.file 5 "Bsp/bsp_ec11.h"
+ 288              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 app_ec11.c
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:19     .text.appEc11Init:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:25     .text.appEc11Init:00000000 appEc11Init
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:48     .text.appEc11Init:0000000c $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:280    .bss.ec11_dev:00000000 ec11_dev
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:53     .text.appEc11ExtiCallback:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:59     .text.appEc11ExtiCallback:00000000 appEc11ExtiCallback
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:180    .text.appEc11ExtiCallback:00000068 $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:274    .bss.last_a_trigger.1:00000000 last_a_trigger.1
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:268    .bss.last_btn_trigger.0:00000000 last_btn_trigger.0
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:187    .text.appEc11GetCount:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:193    .text.appEc11GetCount:00000000 appEc11GetCount
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:208    .text.appEc11GetCount:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:213    .text.appEc11GetDirection:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:219    .text.appEc11GetDirection:00000000 appEc11GetDirection
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:234    .text.appEc11GetDirection:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:239    .text.appEc11GetButtonState:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:245    .text.appEc11GetButtonState:00000000 appEc11GetButtonState
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:260    .text.appEc11GetButtonState:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:265    .bss.last_btn_trigger.0:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:271    .bss.last_a_trigger.1:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cc4QpUpf.s:277    .bss.ec11_dev:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GetTick
+bspReadEc11PinB
+bspReadEc11PinBtn

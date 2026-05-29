@@ -1,0 +1,1658 @@
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"app_keyboard.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "App/app_keyboard.c"
+  18              		.section	.text.processNormalKeyboard,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	processNormalKeyboard:
+  25              	.LFB70:
+   1:App/app_keyboard.c **** #include "app_keyboard.h"
+   2:App/app_keyboard.c **** #include "bsp_key.h"
+   3:App/app_keyboard.c **** #include "app_macro.h"
+   4:App/app_keyboard.c **** #include "app_ec11.h"
+   5:App/app_keyboard.c **** #include "main.h"
+   6:App/app_keyboard.c **** #include <string.h>
+   7:App/app_keyboard.c **** #include "usb_device.h"
+   8:App/app_keyboard.c **** #include "usbd_hid.h"
+   9:App/app_keyboard.c **** 
+  10:App/app_keyboard.c **** extern USBD_HandleTypeDef hUsbDeviceFS;
+  11:App/app_keyboard.c **** 
+  12:App/app_keyboard.c **** typedef struct
+  13:App/app_keyboard.c **** {
+  14:App/app_keyboard.c ****     uint8_t modifier;
+  15:App/app_keyboard.c ****     uint8_t reserved;
+  16:App/app_keyboard.c ****     uint8_t keycode[6];
+  17:App/app_keyboard.c **** } Keyboard_Report_t;
+  18:App/app_keyboard.c **** 
+  19:App/app_keyboard.c **** static Keyboard_Report_t keyboard_report = {0};
+  20:App/app_keyboard.c **** 
+  21:App/app_keyboard.c **** #define MACRO_STD_DELAY 25
+  22:App/app_keyboard.c **** #define HID_SCAN_INTERVAL_MS 10
+  23:App/app_keyboard.c **** 
+  24:App/app_keyboard.c **** typedef enum
+  25:App/app_keyboard.c **** {
+  26:App/app_keyboard.c ****     MODE_NORMAL_KEYBOARD,
+  27:App/app_keyboard.c ****     MODE_MACRO_KEYBOARD
+  28:App/app_keyboard.c **** } KeyboardMode;
+  29:App/app_keyboard.c **** 
+  30:App/app_keyboard.c **** static KeyboardMode current_mode_ = MODE_MACRO_KEYBOARD;
+  31:App/app_keyboard.c **** 
+  32:App/app_keyboard.c **** #define MACRO_KEY_PRESS_DURATION 50
+  33:App/app_keyboard.c **** #define MACRO_UI_RENDER_DELAY 10
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 2
+
+
+  34:App/app_keyboard.c **** #define MACRO_MOUSE_HOVER_DURATION 10
+  35:App/app_keyboard.c **** #define MACRO_MOUSE_CLICK_DURATION 50
+  36:App/app_keyboard.c **** 
+  37:App/app_keyboard.c **** //{DUAL_KEY(键1, 键2), x坐标, y坐标, 鼠标左键状态, 鼠标右键状态, 持续时间ms}
+  38:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_10[] = {
+  39:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  40:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  41:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+  42:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  43:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1046, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  44:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1046, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  45:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  46:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  47:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  48:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  49:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  50:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  51:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  52:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  53:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+  54:App/app_keyboard.c **** 
+  55:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_20[] = {
+  56:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  57:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  58:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+  59:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  60:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1108, 584, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  61:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1108, 584, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  62:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  63:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  64:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  65:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  66:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  67:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  68:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  69:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  70:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+  71:App/app_keyboard.c **** 
+  72:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_50[] = {
+  73:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  74:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  75:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+  76:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  77:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1157, 583, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  78:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1157, 583, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  79:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  80:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  81:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  82:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  83:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  84:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  85:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  86:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  87:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+  88:App/app_keyboard.c **** 
+  89:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_100[] = {
+  90:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 3
+
+
+  91:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+  92:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+  93:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  94:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  95:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  96:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  97:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+  98:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+  99:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 100:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 101:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 102:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 103:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 104:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+ 105:App/app_keyboard.c **** 
+ 106:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_200[] = {
+ 107:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 108:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 109:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+ 110:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 111:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 112:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 113:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 114:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 115:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 116:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 117:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 118:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 119:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 120:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 121:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, MACRO_UI_RENDER_DELAY},
+ 122:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 123:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 124:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 1210, 581, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 125:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 126:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 127:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 960, 670, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 128:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 129:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 1, 0, MACRO_MOUSE_CLICK_DURATION},
+ 130:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 900, 575, 0, 0, MACRO_MOUSE_HOVER_DURATION},
+ 131:App/app_keyboard.c ****     {DUAL_KEY(73, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 132:App/app_keyboard.c ****     {DUAL_KEY(79, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 133:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+ 134:App/app_keyboard.c **** 
+ 135:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_ADDHEALTH[] = {
+ 136:App/app_keyboard.c ****     {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 137:App/app_keyboard.c ****     {DUAL_KEY(17, 49), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 138:App/app_keyboard.c ****     {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 139:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+ 140:App/app_keyboard.c **** 
+ 141:App/app_keyboard.c **** static const MacroFrame MACRO_SEQUENCE_ADDBULLET[] = {
+ 142:App/app_keyboard.c ****     {DUAL_KEY(72, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 143:App/app_keyboard.c ****     {DUAL_KEY(17, 50), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 144:App/app_keyboard.c ****     {DUAL_KEY(89, 0), 0, 0, 0, 0, MACRO_KEY_PRESS_DURATION},
+ 145:App/app_keyboard.c ****     {DUAL_KEY(0, 0), 0, 0, 0, 0, 33}};
+ 146:App/app_keyboard.c **** 
+ 147:App/app_keyboard.c **** #define SEQ_LEN(seq) (sizeof(seq) / sizeof(MacroFrame))
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 4
+
+
+ 148:App/app_keyboard.c **** 
+ 149:App/app_keyboard.c **** typedef struct
+ 150:App/app_keyboard.c **** {
+ 151:App/app_keyboard.c ****     GPIO_TypeDef *port_;
+ 152:App/app_keyboard.c ****     uint16_t pin_;
+ 153:App/app_keyboard.c ****     uint8_t hid_code_;
+ 154:App/app_keyboard.c **** } KeyMap;
+ 155:App/app_keyboard.c **** 
+ 156:App/app_keyboard.c **** static const KeyMap NUMPAD_MAP[] = {
+ 157:App/app_keyboard.c ****     {K_NUM_GPIO_Port, K_NUM_Pin, 0x53},           // Num Lock
+ 158:App/app_keyboard.c ****     {K_DIVISION_GPIO_Port, K_DIVISION_Pin, 0x54}, // /
+ 159:App/app_keyboard.c ****     {K_MULTIPLE_GPIO_Port, K_MULTIPLE_Pin, 0x55}, // *
+ 160:App/app_keyboard.c ****     {K_MINUS_GPIO_Port, K_MINUS_Pin, 0x56},       // -
+ 161:App/app_keyboard.c ****     {K_PLUS_GPIO_Port, K_PLUS_Pin, 0x57},         // +
+ 162:App/app_keyboard.c ****     {K_ENTER_GPIO_Port, K_ENTER_Pin, 0x58},       // Enter
+ 163:App/app_keyboard.c ****     {K_1_GPIO_Port, K_1_Pin, 0x59},
+ 164:App/app_keyboard.c ****     {K_2_GPIO_Port, K_2_Pin, 0x5A},
+ 165:App/app_keyboard.c ****     {K_3_GPIO_Port, K_3_Pin, 0x5B},
+ 166:App/app_keyboard.c ****     {K_4_GPIO_Port, K_4_Pin, 0x5C},
+ 167:App/app_keyboard.c ****     {K_5_GPIO_Port, K_5_Pin, 0x5D},
+ 168:App/app_keyboard.c ****     {K_6_GPIO_Port, K_6_Pin, 0x5E},
+ 169:App/app_keyboard.c ****     {K_7_GPIO_Port, K_7_Pin, 0x5F},
+ 170:App/app_keyboard.c ****     {K_8_GPIO_Port, K_8_Pin, 0x60},
+ 171:App/app_keyboard.c ****     {K_9_GPIO_Port, K_9_Pin, 0x61},
+ 172:App/app_keyboard.c ****     {K_0_GPIO_Port, K_0_Pin, 0x62},
+ 173:App/app_keyboard.c ****     {K_DOT_GPIO_Port, K_DOT_Pin, 0x63},  // .
+ 174:App/app_keyboard.c ****     {K_BACK_GPIO_Port, K_BACK_Pin, 0x2A} // Backspace
+ 175:App/app_keyboard.c **** };
+ 176:App/app_keyboard.c **** #define NUMPAD_KEY_COUNT (sizeof(NUMPAD_MAP) / sizeof(KeyMap))
+ 177:App/app_keyboard.c **** 
+ 178:App/app_keyboard.c **** static void processNormalKeyboard(void);
+ 179:App/app_keyboard.c **** 
+ 180:App/app_keyboard.c **** void appKeyboardInit(void)
+ 181:App/app_keyboard.c **** {
+ 182:App/app_keyboard.c ****     bspKeyInit();
+ 183:App/app_keyboard.c ****     appMacroInit();
+ 184:App/app_keyboard.c **** }
+ 185:App/app_keyboard.c **** 
+ 186:App/app_keyboard.c **** void appKeyboardUpdate(void)
+ 187:App/app_keyboard.c **** {
+ 188:App/app_keyboard.c ****     static Ec11ButtonState last_btn_state = EC11_BTN_RELEASED;
+ 189:App/app_keyboard.c ****     Ec11ButtonState current_btn_state = appEc11GetButtonState();
+ 190:App/app_keyboard.c ****     KeyEvent event = bspKeyScan();
+ 191:App/app_keyboard.c **** 
+ 192:App/app_keyboard.c ****     if (current_btn_state == EC11_BTN_PRESSED && last_btn_state == EC11_BTN_RELEASED)
+ 193:App/app_keyboard.c ****     {
+ 194:App/app_keyboard.c ****         current_mode_ = (current_mode_ == MODE_NORMAL_KEYBOARD) ? MODE_MACRO_KEYBOARD : MODE_NORMAL
+ 195:App/app_keyboard.c ****     }
+ 196:App/app_keyboard.c ****     last_btn_state = current_btn_state;
+ 197:App/app_keyboard.c **** 
+ 198:App/app_keyboard.c ****     if (event == KEY_EVENT_TOGGLE_MODE)
+ 199:App/app_keyboard.c ****     {
+ 200:App/app_keyboard.c ****         current_mode_ = (current_mode_ == MODE_NORMAL_KEYBOARD) ? MODE_MACRO_KEYBOARD : MODE_NORMAL
+ 201:App/app_keyboard.c ****     }
+ 202:App/app_keyboard.c **** 
+ 203:App/app_keyboard.c ****     if (current_mode_ == MODE_MACRO_KEYBOARD)
+ 204:App/app_keyboard.c ****     {
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 5
+
+
+ 205:App/app_keyboard.c ****         if (!appMacroIsRunning())
+ 206:App/app_keyboard.c ****         {
+ 207:App/app_keyboard.c ****             switch (event)
+ 208:App/app_keyboard.c ****             {
+ 209:App/app_keyboard.c ****             case KEY_EVENT_1_PRESSED:
+ 210:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_10, SEQ_LEN(MACRO_SEQUENCE_10));
+ 211:App/app_keyboard.c ****                 break;
+ 212:App/app_keyboard.c ****             case KEY_EVENT_2_PRESSED:
+ 213:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_20, SEQ_LEN(MACRO_SEQUENCE_20));
+ 214:App/app_keyboard.c ****                 break;
+ 215:App/app_keyboard.c ****             case KEY_EVENT_3_PRESSED:
+ 216:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_50, SEQ_LEN(MACRO_SEQUENCE_50));
+ 217:App/app_keyboard.c ****                 break;
+ 218:App/app_keyboard.c ****             case KEY_EVENT_PLUS_PRESSED:
+ 219:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_100, SEQ_LEN(MACRO_SEQUENCE_100));
+ 220:App/app_keyboard.c ****                 break;
+ 221:App/app_keyboard.c ****             case KEY_EVENT_ENTER_PRESSED:
+ 222:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_200, SEQ_LEN(MACRO_SEQUENCE_200));
+ 223:App/app_keyboard.c ****                 break;
+ 224:App/app_keyboard.c ****             case KEY_EVENT_0_PRESSED:
+ 225:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_ADDHEALTH, SEQ_LEN(MACRO_SEQUENCE_ADDHEALTH));
+ 226:App/app_keyboard.c ****                 break;
+ 227:App/app_keyboard.c ****             case KEY_EVENT_DOT_PRESSED:
+ 228:App/app_keyboard.c ****                 appMacroPlay(MACRO_SEQUENCE_ADDBULLET, SEQ_LEN(MACRO_SEQUENCE_ADDBULLET));
+ 229:App/app_keyboard.c ****                 break;
+ 230:App/app_keyboard.c ****             default:
+ 231:App/app_keyboard.c ****                 break;
+ 232:App/app_keyboard.c ****             }
+ 233:App/app_keyboard.c ****         }
+ 234:App/app_keyboard.c ****     }
+ 235:App/app_keyboard.c ****     else if (current_mode_ == MODE_NORMAL_KEYBOARD)
+ 236:App/app_keyboard.c ****     {
+ 237:App/app_keyboard.c ****         processNormalKeyboard();
+ 238:App/app_keyboard.c ****     }
+ 239:App/app_keyboard.c **** 
+ 240:App/app_keyboard.c ****     appMacroUpdate();
+ 241:App/app_keyboard.c **** }
+ 242:App/app_keyboard.c **** 
+ 243:App/app_keyboard.c **** /**
+ 244:App/app_keyboard.c ****  * @brief 普通键盘模式下的矩阵/阵列扫描与 USB HID 报文组装发送逻辑
+ 245:App/app_keyboard.c ****  */
+ 246:App/app_keyboard.c **** static void processNormalKeyboard(void)
+ 247:App/app_keyboard.c **** {
+  26              		.loc 1 247 1 view -0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 8
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30 0000 30B5     		push	{r4, r5, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 12
+  33              		.cfi_offset 4, -12
+  34              		.cfi_offset 5, -8
+  35              		.cfi_offset 14, -4
+  36 0002 83B0     		sub	sp, sp, #12
+  37              	.LCFI1:
+  38              		.cfi_def_cfa_offset 24
+ 248:App/app_keyboard.c ****     static uint32_t last_scan_time = 0;
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 6
+
+
+  39              		.loc 1 248 5 view .LVU1
+ 249:App/app_keyboard.c ****     static uint8_t last_report[8] = {0};
+  40              		.loc 1 249 5 view .LVU2
+ 250:App/app_keyboard.c ****     uint8_t current_report[8] = {0};
+  41              		.loc 1 250 5 view .LVU3
+  42              		.loc 1 250 13 is_stmt 0 view .LVU4
+  43 0004 0023     		movs	r3, #0
+  44 0006 0093     		str	r3, [sp]
+  45 0008 0193     		str	r3, [sp, #4]
+ 251:App/app_keyboard.c **** 
+ 252:App/app_keyboard.c ****     uint32_t current_tick = HAL_GetTick();
+  46              		.loc 1 252 5 is_stmt 1 view .LVU5
+  47              		.loc 1 252 29 is_stmt 0 view .LVU6
+  48 000a FFF7FEFF 		bl	HAL_GetTick
+  49              	.LVL0:
+ 253:App/app_keyboard.c **** 
+ 254:App/app_keyboard.c ****     if (current_tick - last_scan_time < HID_SCAN_INTERVAL_MS)
+  50              		.loc 1 254 5 is_stmt 1 view .LVU7
+  51              		.loc 1 254 22 is_stmt 0 view .LVU8
+  52 000e 1D4B     		ldr	r3, .L11
+  53 0010 1B68     		ldr	r3, [r3]
+  54 0012 C31A     		subs	r3, r0, r3
+  55              		.loc 1 254 8 view .LVU9
+  56 0014 092B     		cmp	r3, #9
+  57 0016 27D9     		bls	.L1
+ 255:App/app_keyboard.c ****     {
+ 256:App/app_keyboard.c ****         return;
+ 257:App/app_keyboard.c ****     }
+ 258:App/app_keyboard.c ****     last_scan_time = current_tick;
+  58              		.loc 1 258 5 is_stmt 1 view .LVU10
+  59              		.loc 1 258 20 is_stmt 0 view .LVU11
+  60 0018 1A4B     		ldr	r3, .L11
+  61 001a 1860     		str	r0, [r3]
+ 259:App/app_keyboard.c **** 
+ 260:App/app_keyboard.c ****     uint8_t key_index = 2;
+  62              		.loc 1 260 5 is_stmt 1 view .LVU12
+  63              	.LVL1:
+ 261:App/app_keyboard.c **** 
+ 262:App/app_keyboard.c ****     for (int i = 0; i < NUMPAD_KEY_COUNT; i++)
+  64              		.loc 1 262 5 view .LVU13
+  65              	.LBB2:
+  66              		.loc 1 262 10 view .LVU14
+  67              		.loc 1 262 14 is_stmt 0 view .LVU15
+  68 001c 0024     		movs	r4, #0
+  69              	.LBE2:
+ 260:App/app_keyboard.c **** 
+  70              		.loc 1 260 13 view .LVU16
+  71 001e 0225     		movs	r5, #2
+  72              	.LBB3:
+  73              		.loc 1 262 5 view .LVU17
+  74 0020 00E0     		b	.L4
+  75              	.LVL2:
+  76              	.L5:
+  77              		.loc 1 262 44 is_stmt 1 discriminator 2 view .LVU18
+  78 0022 0134     		adds	r4, r4, #1
+  79              	.LVL3:
+  80              	.L4:
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 7
+
+
+  81              		.loc 1 262 23 discriminator 1 view .LVU19
+  82 0024 112C     		cmp	r4, #17
+  83 0026 19D8     		bhi	.L6
+ 263:App/app_keyboard.c ****     {
+ 264:App/app_keyboard.c ****         if (HAL_GPIO_ReadPin(NUMPAD_MAP[i].port_, NUMPAD_MAP[i].pin_) == GPIO_PIN_RESET)
+  84              		.loc 1 264 9 view .LVU20
+  85              		.loc 1 264 43 is_stmt 0 view .LVU21
+  86 0028 174B     		ldr	r3, .L11+4
+  87              		.loc 1 264 64 view .LVU22
+  88 002a 03EBC402 		add	r2, r3, r4, lsl #3
+  89              		.loc 1 264 13 view .LVU23
+  90 002e 9188     		ldrh	r1, [r2, #4]
+  91 0030 53F83400 		ldr	r0, [r3, r4, lsl #3]
+  92 0034 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+  93              	.LVL4:
+  94              		.loc 1 264 12 discriminator 1 view .LVU24
+  95 0038 0028     		cmp	r0, #0
+  96 003a F2D1     		bne	.L5
+ 265:App/app_keyboard.c ****         {
+ 266:App/app_keyboard.c ****             current_report[key_index++] = NUMPAD_MAP[i].hid_code_;
+  97              		.loc 1 266 13 is_stmt 1 view .LVU25
+  98              		.loc 1 266 37 is_stmt 0 view .LVU26
+  99 003c 6B1C     		adds	r3, r5, #1
+ 100 003e DBB2     		uxtb	r3, r3
+ 101              	.LVL5:
+ 102              		.loc 1 266 56 view .LVU27
+ 103 0040 114A     		ldr	r2, .L11+4
+ 104 0042 02EBC402 		add	r2, r2, r4, lsl #3
+ 105 0046 9279     		ldrb	r2, [r2, #6]	@ zero_extendqisi2
+ 106              		.loc 1 266 41 view .LVU28
+ 107 0048 05F10801 		add	r1, r5, #8
+ 108 004c 0DEB0105 		add	r5, sp, r1
+ 109 0050 05F8082C 		strb	r2, [r5, #-8]
+ 267:App/app_keyboard.c **** 
+ 268:App/app_keyboard.c ****             if (key_index >= 4)
+ 110              		.loc 1 268 13 is_stmt 1 view .LVU29
+ 111              		.loc 1 268 16 is_stmt 0 view .LVU30
+ 112 0054 032B     		cmp	r3, #3
+ 113 0056 01D8     		bhi	.L6
+ 266:App/app_keyboard.c **** 
+ 114              		.loc 1 266 37 view .LVU31
+ 115 0058 1D46     		mov	r5, r3
+ 116 005a E2E7     		b	.L5
+ 117              	.LVL6:
+ 118              	.L6:
+ 266:App/app_keyboard.c **** 
+ 119              		.loc 1 266 37 view .LVU32
+ 120              	.LBE3:
+ 269:App/app_keyboard.c ****             {
+ 270:App/app_keyboard.c ****                 break;
+ 271:App/app_keyboard.c ****             }
+ 272:App/app_keyboard.c ****         }
+ 273:App/app_keyboard.c ****     }
+ 274:App/app_keyboard.c **** 
+ 275:App/app_keyboard.c ****     if (memcmp(last_report, current_report, 8) != 0)
+ 121              		.loc 1 275 5 is_stmt 1 view .LVU33
+ 122              		.loc 1 275 9 is_stmt 0 view .LVU34
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 8
+
+
+ 123 005c 0822     		movs	r2, #8
+ 124 005e 6946     		mov	r1, sp
+ 125 0060 0A48     		ldr	r0, .L11+8
+ 126 0062 FFF7FEFF 		bl	memcmp
+ 127              	.LVL7:
+ 128              		.loc 1 275 8 discriminator 1 view .LVU35
+ 129 0066 08B9     		cbnz	r0, .L10
+ 130              	.LVL8:
+ 131              	.L1:
+ 276:App/app_keyboard.c ****     {
+ 277:App/app_keyboard.c ****         memcpy(last_report, current_report, 8);
+ 278:App/app_keyboard.c ****         USBD_HID_SendReport(&hUsbDeviceFS, current_report, 8);
+ 279:App/app_keyboard.c ****     }
+ 280:App/app_keyboard.c **** }
+ 132              		.loc 1 280 1 view .LVU36
+ 133 0068 03B0     		add	sp, sp, #12
+ 134              	.LCFI2:
+ 135              		.cfi_remember_state
+ 136              		.cfi_def_cfa_offset 12
+ 137              		@ sp needed
+ 138 006a 30BD     		pop	{r4, r5, pc}
+ 139              	.LVL9:
+ 140              	.L10:
+ 141              	.LCFI3:
+ 142              		.cfi_restore_state
+ 277:App/app_keyboard.c ****         USBD_HID_SendReport(&hUsbDeviceFS, current_report, 8);
+ 143              		.loc 1 277 9 is_stmt 1 view .LVU37
+ 144 006c 074A     		ldr	r2, .L11+8
+ 145 006e 6B46     		mov	r3, sp
+ 146 0070 93E80300 		ldm	r3, {r0, r1}
+ 147 0074 82E80300 		stm	r2, {r0, r1}
+ 278:App/app_keyboard.c ****     }
+ 148              		.loc 1 278 9 view .LVU38
+ 149 0078 0822     		movs	r2, #8
+ 150 007a 1946     		mov	r1, r3
+ 151 007c 0448     		ldr	r0, .L11+12
+ 152 007e FFF7FEFF 		bl	USBD_HID_SendReport
+ 153              	.LVL10:
+ 154 0082 F1E7     		b	.L1
+ 155              	.L12:
+ 156              		.align	2
+ 157              	.L11:
+ 158 0084 00000000 		.word	last_scan_time.1
+ 159 0088 00000000 		.word	NUMPAD_MAP
+ 160 008c 00000000 		.word	last_report.0
+ 161 0090 00000000 		.word	hUsbDeviceFS
+ 162              		.cfi_endproc
+ 163              	.LFE70:
+ 165              		.section	.text.appKeyboardInit,"ax",%progbits
+ 166              		.align	1
+ 167              		.global	appKeyboardInit
+ 168              		.syntax unified
+ 169              		.thumb
+ 170              		.thumb_func
+ 172              	appKeyboardInit:
+ 173              	.LFB68:
+ 181:App/app_keyboard.c ****     bspKeyInit();
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 9
+
+
+ 174              		.loc 1 181 1 view -0
+ 175              		.cfi_startproc
+ 176              		@ args = 0, pretend = 0, frame = 0
+ 177              		@ frame_needed = 0, uses_anonymous_args = 0
+ 178 0000 08B5     		push	{r3, lr}
+ 179              	.LCFI4:
+ 180              		.cfi_def_cfa_offset 8
+ 181              		.cfi_offset 3, -8
+ 182              		.cfi_offset 14, -4
+ 182:App/app_keyboard.c ****     appMacroInit();
+ 183              		.loc 1 182 5 view .LVU40
+ 184 0002 FFF7FEFF 		bl	bspKeyInit
+ 185              	.LVL11:
+ 183:App/app_keyboard.c **** }
+ 186              		.loc 1 183 5 view .LVU41
+ 187 0006 FFF7FEFF 		bl	appMacroInit
+ 188              	.LVL12:
+ 184:App/app_keyboard.c **** 
+ 189              		.loc 1 184 1 is_stmt 0 view .LVU42
+ 190 000a 08BD     		pop	{r3, pc}
+ 191              		.cfi_endproc
+ 192              	.LFE68:
+ 194              		.section	.text.appKeyboardUpdate,"ax",%progbits
+ 195              		.align	1
+ 196              		.global	appKeyboardUpdate
+ 197              		.syntax unified
+ 198              		.thumb
+ 199              		.thumb_func
+ 201              	appKeyboardUpdate:
+ 202              	.LFB69:
+ 187:App/app_keyboard.c ****     static Ec11ButtonState last_btn_state = EC11_BTN_RELEASED;
+ 203              		.loc 1 187 1 is_stmt 1 view -0
+ 204              		.cfi_startproc
+ 205              		@ args = 0, pretend = 0, frame = 0
+ 206              		@ frame_needed = 0, uses_anonymous_args = 0
+ 207 0000 38B5     		push	{r3, r4, r5, lr}
+ 208              	.LCFI5:
+ 209              		.cfi_def_cfa_offset 16
+ 210              		.cfi_offset 3, -16
+ 211              		.cfi_offset 4, -12
+ 212              		.cfi_offset 5, -8
+ 213              		.cfi_offset 14, -4
+ 188:App/app_keyboard.c ****     Ec11ButtonState current_btn_state = appEc11GetButtonState();
+ 214              		.loc 1 188 5 view .LVU44
+ 189:App/app_keyboard.c ****     KeyEvent event = bspKeyScan();
+ 215              		.loc 1 189 5 view .LVU45
+ 189:App/app_keyboard.c ****     KeyEvent event = bspKeyScan();
+ 216              		.loc 1 189 41 is_stmt 0 view .LVU46
+ 217 0002 FFF7FEFF 		bl	appEc11GetButtonState
+ 218              	.LVL13:
+ 219 0006 0446     		mov	r4, r0
+ 220              	.LVL14:
+ 190:App/app_keyboard.c **** 
+ 221              		.loc 1 190 5 is_stmt 1 view .LVU47
+ 190:App/app_keyboard.c **** 
+ 222              		.loc 1 190 22 is_stmt 0 view .LVU48
+ 223 0008 FFF7FEFF 		bl	bspKeyScan
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 10
+
+
+ 224              	.LVL15:
+ 225 000c 0546     		mov	r5, r0
+ 226              	.LVL16:
+ 192:App/app_keyboard.c ****     {
+ 227              		.loc 1 192 5 is_stmt 1 view .LVU49
+ 192:App/app_keyboard.c ****     {
+ 228              		.loc 1 192 8 is_stmt 0 view .LVU50
+ 229 000e 012C     		cmp	r4, #1
+ 230 0010 0CD0     		beq	.L30
+ 231              	.L16:
+ 196:App/app_keyboard.c **** 
+ 232              		.loc 1 196 5 is_stmt 1 view .LVU51
+ 196:App/app_keyboard.c **** 
+ 233              		.loc 1 196 20 is_stmt 0 view .LVU52
+ 234 0012 384B     		ldr	r3, .L34
+ 235 0014 1C70     		strb	r4, [r3]
+ 198:App/app_keyboard.c ****     {
+ 236              		.loc 1 198 5 is_stmt 1 view .LVU53
+ 198:App/app_keyboard.c ****     {
+ 237              		.loc 1 198 8 is_stmt 0 view .LVU54
+ 238 0016 132D     		cmp	r5, #19
+ 239 0018 13D0     		beq	.L31
+ 240              	.L17:
+ 203:App/app_keyboard.c ****     {
+ 241              		.loc 1 203 5 is_stmt 1 view .LVU55
+ 203:App/app_keyboard.c ****     {
+ 242              		.loc 1 203 23 is_stmt 0 view .LVU56
+ 243 001a 374B     		ldr	r3, .L34+4
+ 244 001c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 203:App/app_keyboard.c ****     {
+ 245              		.loc 1 203 8 view .LVU57
+ 246 001e 012B     		cmp	r3, #1
+ 247 0020 16D0     		beq	.L32
+ 235:App/app_keyboard.c ****     {
+ 248              		.loc 1 235 10 is_stmt 1 view .LVU58
+ 235:App/app_keyboard.c ****     {
+ 249              		.loc 1 235 13 is_stmt 0 view .LVU59
+ 250 0022 002B     		cmp	r3, #0
+ 251 0024 63D0     		beq	.L33
+ 252              	.L19:
+ 240:App/app_keyboard.c **** }
+ 253              		.loc 1 240 5 is_stmt 1 view .LVU60
+ 254 0026 FFF7FEFF 		bl	appMacroUpdate
+ 255              	.LVL17:
+ 241:App/app_keyboard.c **** 
+ 256              		.loc 1 241 1 is_stmt 0 view .LVU61
+ 257 002a 38BD     		pop	{r3, r4, r5, pc}
+ 258              	.LVL18:
+ 259              	.L30:
+ 192:App/app_keyboard.c ****     {
+ 260              		.loc 1 192 65 discriminator 1 view .LVU62
+ 261 002c 314B     		ldr	r3, .L34
+ 262 002e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 192:App/app_keyboard.c ****     {
+ 263              		.loc 1 192 47 discriminator 1 view .LVU63
+ 264 0030 002B     		cmp	r3, #0
+ 265 0032 EED1     		bne	.L16
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 11
+
+
+ 194:App/app_keyboard.c ****     }
+ 266              		.loc 1 194 9 is_stmt 1 view .LVU64
+ 194:App/app_keyboard.c ****     }
+ 267              		.loc 1 194 87 is_stmt 0 view .LVU65
+ 268 0034 304A     		ldr	r2, .L34+4
+ 269 0036 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 270 0038 B3FA83F3 		clz	r3, r3
+ 271 003c 5B09     		lsrs	r3, r3, #5
+ 194:App/app_keyboard.c ****     }
+ 272              		.loc 1 194 23 view .LVU66
+ 273 003e 1370     		strb	r3, [r2]
+ 274 0040 E7E7     		b	.L16
+ 275              	.L31:
+ 200:App/app_keyboard.c ****     }
+ 276              		.loc 1 200 9 is_stmt 1 view .LVU67
+ 200:App/app_keyboard.c ****     }
+ 277              		.loc 1 200 87 is_stmt 0 view .LVU68
+ 278 0042 2D4A     		ldr	r2, .L34+4
+ 279 0044 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 280 0046 B3FA83F3 		clz	r3, r3
+ 281 004a 5B09     		lsrs	r3, r3, #5
+ 200:App/app_keyboard.c ****     }
+ 282              		.loc 1 200 23 view .LVU69
+ 283 004c 1370     		strb	r3, [r2]
+ 284 004e E4E7     		b	.L17
+ 285              	.L32:
+ 205:App/app_keyboard.c ****         {
+ 286              		.loc 1 205 9 is_stmt 1 view .LVU70
+ 205:App/app_keyboard.c ****         {
+ 287              		.loc 1 205 14 is_stmt 0 view .LVU71
+ 288 0050 FFF7FEFF 		bl	appMacroIsRunning
+ 289              	.LVL19:
+ 205:App/app_keyboard.c ****         {
+ 290              		.loc 1 205 12 discriminator 1 view .LVU72
+ 291 0054 0028     		cmp	r0, #0
+ 292 0056 E6D1     		bne	.L19
+ 207:App/app_keyboard.c ****             {
+ 293              		.loc 1 207 13 is_stmt 1 view .LVU73
+ 294 0058 681E     		subs	r0, r5, #1
+ 295 005a 1028     		cmp	r0, #16
+ 296 005c E3D8     		bhi	.L19
+ 297 005e 01A3     		adr	r3, .L21
+ 298 0060 53F820F0 		ldr	pc, [r3, r0, lsl #2]
+ 299              		.p2align 2
+ 300              	.L21:
+ 301 0064 DB000000 		.word	.L27+1
+ 302 0068 A9000000 		.word	.L26+1
+ 303 006c B3000000 		.word	.L25+1
+ 304 0070 BD000000 		.word	.L24+1
+ 305 0074 27000000 		.word	.L19+1
+ 306 0078 27000000 		.word	.L19+1
+ 307 007c 27000000 		.word	.L19+1
+ 308 0080 27000000 		.word	.L19+1
+ 309 0084 27000000 		.word	.L19+1
+ 310 0088 27000000 		.word	.L19+1
+ 311 008c E5000000 		.word	.L23+1
+ 312 0090 27000000 		.word	.L19+1
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 12
+
+
+ 313 0094 27000000 		.word	.L19+1
+ 314 0098 27000000 		.word	.L19+1
+ 315 009c C7000000 		.word	.L22+1
+ 316 00a0 27000000 		.word	.L19+1
+ 317 00a4 D1000000 		.word	.L20+1
+ 318              		.p2align 1
+ 319              	.L26:
+ 210:App/app_keyboard.c ****                 break;
+ 320              		.loc 1 210 17 view .LVU74
+ 321 00a8 0F21     		movs	r1, #15
+ 322 00aa 1448     		ldr	r0, .L34+8
+ 323 00ac FFF7FEFF 		bl	appMacroPlay
+ 324              	.LVL20:
+ 211:App/app_keyboard.c ****             case KEY_EVENT_2_PRESSED:
+ 325              		.loc 1 211 17 view .LVU75
+ 326 00b0 B9E7     		b	.L19
+ 327              	.L25:
+ 213:App/app_keyboard.c ****                 break;
+ 328              		.loc 1 213 17 view .LVU76
+ 329 00b2 0F21     		movs	r1, #15
+ 330 00b4 1248     		ldr	r0, .L34+12
+ 331 00b6 FFF7FEFF 		bl	appMacroPlay
+ 332              	.LVL21:
+ 214:App/app_keyboard.c ****             case KEY_EVENT_3_PRESSED:
+ 333              		.loc 1 214 17 view .LVU77
+ 334 00ba B4E7     		b	.L19
+ 335              	.L24:
+ 216:App/app_keyboard.c ****                 break;
+ 336              		.loc 1 216 17 view .LVU78
+ 337 00bc 0F21     		movs	r1, #15
+ 338 00be 1148     		ldr	r0, .L34+16
+ 339 00c0 FFF7FEFF 		bl	appMacroPlay
+ 340              	.LVL22:
+ 217:App/app_keyboard.c ****             case KEY_EVENT_PLUS_PRESSED:
+ 341              		.loc 1 217 17 view .LVU79
+ 342 00c4 AFE7     		b	.L19
+ 343              	.L22:
+ 219:App/app_keyboard.c ****                 break;
+ 344              		.loc 1 219 17 view .LVU80
+ 345 00c6 0F21     		movs	r1, #15
+ 346 00c8 0F48     		ldr	r0, .L34+20
+ 347 00ca FFF7FEFF 		bl	appMacroPlay
+ 348              	.LVL23:
+ 220:App/app_keyboard.c ****             case KEY_EVENT_ENTER_PRESSED:
+ 349              		.loc 1 220 17 view .LVU81
+ 350 00ce AAE7     		b	.L19
+ 351              	.L20:
+ 222:App/app_keyboard.c ****                 break;
+ 352              		.loc 1 222 17 view .LVU82
+ 353 00d0 1B21     		movs	r1, #27
+ 354 00d2 0E48     		ldr	r0, .L34+24
+ 355 00d4 FFF7FEFF 		bl	appMacroPlay
+ 356              	.LVL24:
+ 223:App/app_keyboard.c ****             case KEY_EVENT_0_PRESSED:
+ 357              		.loc 1 223 17 view .LVU83
+ 358 00d8 A5E7     		b	.L19
+ 359              	.L27:
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 13
+
+
+ 225:App/app_keyboard.c ****                 break;
+ 360              		.loc 1 225 17 view .LVU84
+ 361 00da 0421     		movs	r1, #4
+ 362 00dc 0C48     		ldr	r0, .L34+28
+ 363 00de FFF7FEFF 		bl	appMacroPlay
+ 364              	.LVL25:
+ 226:App/app_keyboard.c ****             case KEY_EVENT_DOT_PRESSED:
+ 365              		.loc 1 226 17 view .LVU85
+ 366 00e2 A0E7     		b	.L19
+ 367              	.L23:
+ 228:App/app_keyboard.c ****                 break;
+ 368              		.loc 1 228 17 view .LVU86
+ 369 00e4 0421     		movs	r1, #4
+ 370 00e6 0B48     		ldr	r0, .L34+32
+ 371 00e8 FFF7FEFF 		bl	appMacroPlay
+ 372              	.LVL26:
+ 229:App/app_keyboard.c ****             default:
+ 373              		.loc 1 229 17 view .LVU87
+ 374 00ec 9BE7     		b	.L19
+ 375              	.L33:
+ 237:App/app_keyboard.c ****     }
+ 376              		.loc 1 237 9 view .LVU88
+ 377 00ee FFF7FEFF 		bl	processNormalKeyboard
+ 378              	.LVL27:
+ 379 00f2 98E7     		b	.L19
+ 380              	.L35:
+ 381              		.align	2
+ 382              	.L34:
+ 383 00f4 00000000 		.word	last_btn_state.2
+ 384 00f8 00000000 		.word	current_mode_
+ 385 00fc 00000000 		.word	MACRO_SEQUENCE_10
+ 386 0100 00000000 		.word	MACRO_SEQUENCE_20
+ 387 0104 00000000 		.word	MACRO_SEQUENCE_50
+ 388 0108 00000000 		.word	MACRO_SEQUENCE_100
+ 389 010c 00000000 		.word	MACRO_SEQUENCE_200
+ 390 0110 00000000 		.word	MACRO_SEQUENCE_ADDHEALTH
+ 391 0114 00000000 		.word	MACRO_SEQUENCE_ADDBULLET
+ 392              		.cfi_endproc
+ 393              	.LFE69:
+ 395              		.section	.text.Keyboard_Send_Key,"ax",%progbits
+ 396              		.align	1
+ 397              		.global	Keyboard_Send_Key
+ 398              		.syntax unified
+ 399              		.thumb
+ 400              		.thumb_func
+ 402              	Keyboard_Send_Key:
+ 403              	.LVL28:
+ 404              	.LFB71:
+ 281:App/app_keyboard.c **** 
+ 282:App/app_keyboard.c **** /**
+ 283:App/app_keyboard.c ****  * @brief  向电脑发送指定按键
+ 284:App/app_keyboard.c ****  * @param  modifier: 修饰键状态值 (如 KEY_MOD_LSHIFT)
+ 285:App/app_keyboard.c ****  * @param  key_code1: 标准 USB HID 键码1
+ 286:App/app_keyboard.c ****  * @param  key_code2: 标准 USB HID 键码2 (无需组合时填 0)
+ 287:App/app_keyboard.c ****  */
+ 288:App/app_keyboard.c **** void Keyboard_Send_Key(uint8_t modifier, uint8_t key_code1, uint8_t key_code2)
+ 289:App/app_keyboard.c **** {
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 14
+
+
+ 405              		.loc 1 289 1 view -0
+ 406              		.cfi_startproc
+ 407              		@ args = 0, pretend = 0, frame = 0
+ 408              		@ frame_needed = 0, uses_anonymous_args = 0
+ 409              		.loc 1 289 1 is_stmt 0 view .LVU90
+ 410 0000 70B5     		push	{r4, r5, r6, lr}
+ 411              	.LCFI6:
+ 412              		.cfi_def_cfa_offset 16
+ 413              		.cfi_offset 4, -16
+ 414              		.cfi_offset 5, -12
+ 415              		.cfi_offset 6, -8
+ 416              		.cfi_offset 14, -4
+ 290:App/app_keyboard.c ****     memset(&keyboard_report, 0, sizeof(Keyboard_Report_t));
+ 417              		.loc 1 290 5 is_stmt 1 view .LVU91
+ 418 0002 0D4C     		ldr	r4, .L38
+ 419 0004 0025     		movs	r5, #0
+ 420 0006 2560     		str	r5, [r4]
+ 421 0008 6560     		str	r5, [r4, #4]
+ 291:App/app_keyboard.c **** 
+ 292:App/app_keyboard.c ****     keyboard_report.modifier = modifier;
+ 422              		.loc 1 292 5 view .LVU92
+ 423              		.loc 1 292 30 is_stmt 0 view .LVU93
+ 424 000a 2070     		strb	r0, [r4]
+ 293:App/app_keyboard.c ****     keyboard_report.keycode[0] = key_code1;
+ 425              		.loc 1 293 5 is_stmt 1 view .LVU94
+ 426              		.loc 1 293 32 is_stmt 0 view .LVU95
+ 427 000c A170     		strb	r1, [r4, #2]
+ 294:App/app_keyboard.c ****     keyboard_report.keycode[1] = key_code2;
+ 428              		.loc 1 294 5 is_stmt 1 view .LVU96
+ 429              		.loc 1 294 32 is_stmt 0 view .LVU97
+ 430 000e E270     		strb	r2, [r4, #3]
+ 295:App/app_keyboard.c **** 
+ 296:App/app_keyboard.c ****     USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboard_report, sizeof(Keyboard_Report_t));
+ 431              		.loc 1 296 5 is_stmt 1 view .LVU98
+ 432 0010 0A4E     		ldr	r6, .L38+4
+ 433 0012 0822     		movs	r2, #8
+ 434              	.LVL29:
+ 435              		.loc 1 296 5 is_stmt 0 view .LVU99
+ 436 0014 2146     		mov	r1, r4
+ 437              	.LVL30:
+ 438              		.loc 1 296 5 view .LVU100
+ 439 0016 3046     		mov	r0, r6
+ 440              	.LVL31:
+ 441              		.loc 1 296 5 view .LVU101
+ 442 0018 FFF7FEFF 		bl	USBD_HID_SendReport
+ 443              	.LVL32:
+ 297:App/app_keyboard.c ****     HAL_Delay(20);
+ 444              		.loc 1 297 5 is_stmt 1 view .LVU102
+ 445 001c 1420     		movs	r0, #20
+ 446 001e FFF7FEFF 		bl	HAL_Delay
+ 447              	.LVL33:
+ 298:App/app_keyboard.c **** 
+ 299:App/app_keyboard.c ****     memset(&keyboard_report, 0, sizeof(Keyboard_Report_t));
+ 448              		.loc 1 299 5 view .LVU103
+ 449 0022 2560     		str	r5, [r4]
+ 450 0024 6560     		str	r5, [r4, #4]
+ 300:App/app_keyboard.c ****     USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboard_report, sizeof(Keyboard_Report_t));
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 15
+
+
+ 451              		.loc 1 300 5 view .LVU104
+ 452 0026 0822     		movs	r2, #8
+ 453 0028 2146     		mov	r1, r4
+ 454 002a 3046     		mov	r0, r6
+ 455 002c FFF7FEFF 		bl	USBD_HID_SendReport
+ 456              	.LVL34:
+ 301:App/app_keyboard.c ****     HAL_Delay(20);
+ 457              		.loc 1 301 5 view .LVU105
+ 458 0030 1420     		movs	r0, #20
+ 459 0032 FFF7FEFF 		bl	HAL_Delay
+ 460              	.LVL35:
+ 302:App/app_keyboard.c **** }...
+ 461              		.loc 1 302 1 is_stmt 0 view .LVU106
+ 462 0036 70BD     		pop	{r4, r5, r6, pc}
+ 463              	.L39:
+ 464              		.align	2
+ 465              	.L38:
+ 466 0038 00000000 		.word	keyboard_report
+ 467 003c 00000000 		.word	hUsbDeviceFS
+ 468              		.cfi_endproc
+ 469              	.LFE71:
+ 471              		.section	.bss.last_report.0,"aw",%nobits
+ 472              		.align	2
+ 475              	last_report.0:
+ 476 0000 00000000 		.space	8
+ 476      00000000 
+ 477              		.section	.bss.last_scan_time.1,"aw",%nobits
+ 478              		.align	2
+ 481              	last_scan_time.1:
+ 482 0000 00000000 		.space	4
+ 483              		.section	.bss.last_btn_state.2,"aw",%nobits
+ 486              	last_btn_state.2:
+ 487 0000 00       		.space	1
+ 488              		.section	.rodata.NUMPAD_MAP,"a"
+ 489              		.align	2
+ 492              	NUMPAD_MAP:
+ 493 0000 000C0140 		.word	1073810432
+ 494 0004 8000     		.short	128
+ 495 0006 53       		.byte	83
+ 496 0007 00       		.space	1
+ 497 0008 000C0140 		.word	1073810432
+ 498 000c 0001     		.short	256
+ 499 000e 54       		.byte	84
+ 500 000f 00       		.space	1
+ 501 0010 000C0140 		.word	1073810432
+ 502 0014 0002     		.short	512
+ 503 0016 55       		.byte	85
+ 504 0017 00       		.space	1
+ 505 0018 000C0140 		.word	1073810432
+ 506 001c 0400     		.short	4
+ 507 001e 56       		.byte	86
+ 508 001f 00       		.space	1
+ 509 0020 000C0140 		.word	1073810432
+ 510 0024 0020     		.short	8192
+ 511 0026 57       		.byte	87
+ 512 0027 00       		.space	1
+ 513 0028 00080140 		.word	1073809408
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 16
+
+
+ 514 002c 0001     		.short	256
+ 515 002e 58       		.byte	88
+ 516 002f 00       		.space	1
+ 517 0030 000C0140 		.word	1073810432
+ 518 0034 0004     		.short	1024
+ 519 0036 59       		.byte	89
+ 520 0037 00       		.space	1
+ 521 0038 000C0140 		.word	1073810432
+ 522 003c 0008     		.short	2048
+ 523 003e 5A       		.byte	90
+ 524 003f 00       		.space	1
+ 525 0040 000C0140 		.word	1073810432
+ 526 0044 0010     		.short	4096
+ 527 0046 5B       		.byte	91
+ 528 0047 00       		.space	1
+ 529 0048 00080140 		.word	1073809408
+ 530 004c 8000     		.short	128
+ 531 004e 5C       		.byte	92
+ 532 004f 00       		.space	1
+ 533 0050 000C0140 		.word	1073810432
+ 534 0054 0100     		.short	1
+ 535 0056 5D       		.byte	93
+ 536 0057 00       		.space	1
+ 537 0058 000C0140 		.word	1073810432
+ 538 005c 0200     		.short	2
+ 539 005e 5E       		.byte	94
+ 540 005f 00       		.space	1
+ 541 0060 00080140 		.word	1073809408
+ 542 0064 4000     		.short	64
+ 543 0066 5F       		.byte	95
+ 544 0067 00       		.space	1
+ 545 0068 00080140 		.word	1073809408
+ 546 006c 2000     		.short	32
+ 547 006e 60       		.byte	96
+ 548 006f 00       		.space	1
+ 549 0070 00080140 		.word	1073809408
+ 550 0074 1000     		.short	16
+ 551 0076 61       		.byte	97
+ 552 0077 00       		.space	1
+ 553 0078 000C0140 		.word	1073810432
+ 554 007c 0040     		.short	16384
+ 555 007e 62       		.byte	98
+ 556 007f 00       		.space	1
+ 557 0080 000C0140 		.word	1073810432
+ 558 0084 0080     		.short	-32768
+ 559 0086 63       		.byte	99
+ 560 0087 00       		.space	1
+ 561 0088 00080140 		.word	1073809408
+ 562 008c 0800     		.short	8
+ 563 008e 2A       		.byte	42
+ 564 008f 00       		.space	1
+ 565              		.section	.rodata.MACRO_SEQUENCE_ADDBULLET,"a"
+ 566              		.align	2
+ 569              	MACRO_SEQUENCE_ADDBULLET:
+ 570 0000 4800     		.short	72
+ 571 0002 0000     		.short	0
+ 572 0004 0000     		.short	0
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 17
+
+
+ 573 0006 00       		.byte	0
+ 574 0007 00       		.byte	0
+ 575 0008 32000000 		.word	50
+ 576 000c 1132     		.short	12817
+ 577 000e 0000     		.short	0
+ 578 0010 0000     		.short	0
+ 579 0012 00       		.byte	0
+ 580 0013 00       		.byte	0
+ 581 0014 32000000 		.word	50
+ 582 0018 5900     		.short	89
+ 583 001a 0000     		.short	0
+ 584 001c 0000     		.short	0
+ 585 001e 00       		.byte	0
+ 586 001f 00       		.byte	0
+ 587 0020 32000000 		.word	50
+ 588 0024 0000     		.short	0
+ 589 0026 0000     		.short	0
+ 590 0028 0000     		.short	0
+ 591 002a 00       		.byte	0
+ 592 002b 00       		.byte	0
+ 593 002c 21000000 		.word	33
+ 594              		.section	.rodata.MACRO_SEQUENCE_ADDHEALTH,"a"
+ 595              		.align	2
+ 598              	MACRO_SEQUENCE_ADDHEALTH:
+ 599 0000 4800     		.short	72
+ 600 0002 0000     		.short	0
+ 601 0004 0000     		.short	0
+ 602 0006 00       		.byte	0
+ 603 0007 00       		.byte	0
+ 604 0008 32000000 		.word	50
+ 605 000c 1131     		.short	12561
+ 606 000e 0000     		.short	0
+ 607 0010 0000     		.short	0
+ 608 0012 00       		.byte	0
+ 609 0013 00       		.byte	0
+ 610 0014 32000000 		.word	50
+ 611 0018 5900     		.short	89
+ 612 001a 0000     		.short	0
+ 613 001c 0000     		.short	0
+ 614 001e 00       		.byte	0
+ 615 001f 00       		.byte	0
+ 616 0020 32000000 		.word	50
+ 617 0024 0000     		.short	0
+ 618 0026 0000     		.short	0
+ 619 0028 0000     		.short	0
+ 620 002a 00       		.byte	0
+ 621 002b 00       		.byte	0
+ 622 002c 21000000 		.word	33
+ 623              		.section	.rodata.MACRO_SEQUENCE_200,"a"
+ 624              		.align	2
+ 627              	MACRO_SEQUENCE_200:
+ 628 0000 4900     		.short	73
+ 629 0002 0000     		.short	0
+ 630 0004 0000     		.short	0
+ 631 0006 00       		.byte	0
+ 632 0007 00       		.byte	0
+ 633 0008 32000000 		.word	50
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 18
+
+
+ 634 000c 4F00     		.short	79
+ 635 000e 0000     		.short	0
+ 636 0010 0000     		.short	0
+ 637 0012 00       		.byte	0
+ 638 0013 00       		.byte	0
+ 639 0014 32000000 		.word	50
+ 640 0018 0000     		.short	0
+ 641 001a 0000     		.short	0
+ 642 001c 0000     		.short	0
+ 643 001e 00       		.byte	0
+ 644 001f 00       		.byte	0
+ 645 0020 0A000000 		.word	10
+ 646 0024 0000     		.short	0
+ 647 0026 BA04     		.short	1210
+ 648 0028 4502     		.short	581
+ 649 002a 00       		.byte	0
+ 650 002b 00       		.byte	0
+ 651 002c 0A000000 		.word	10
+ 652 0030 0000     		.short	0
+ 653 0032 BA04     		.short	1210
+ 654 0034 4502     		.short	581
+ 655 0036 01       		.byte	1
+ 656 0037 00       		.byte	0
+ 657 0038 32000000 		.word	50
+ 658 003c 0000     		.short	0
+ 659 003e BA04     		.short	1210
+ 660 0040 4502     		.short	581
+ 661 0042 00       		.byte	0
+ 662 0043 00       		.byte	0
+ 663 0044 0A000000 		.word	10
+ 664 0048 0000     		.short	0
+ 665 004a C003     		.short	960
+ 666 004c 9E02     		.short	670
+ 667 004e 00       		.byte	0
+ 668 004f 00       		.byte	0
+ 669 0050 0A000000 		.word	10
+ 670 0054 0000     		.short	0
+ 671 0056 C003     		.short	960
+ 672 0058 9E02     		.short	670
+ 673 005a 01       		.byte	1
+ 674 005b 00       		.byte	0
+ 675 005c 32000000 		.word	50
+ 676 0060 0000     		.short	0
+ 677 0062 C003     		.short	960
+ 678 0064 9E02     		.short	670
+ 679 0066 00       		.byte	0
+ 680 0067 00       		.byte	0
+ 681 0068 0A000000 		.word	10
+ 682 006c 0000     		.short	0
+ 683 006e 8403     		.short	900
+ 684 0070 3F02     		.short	575
+ 685 0072 00       		.byte	0
+ 686 0073 00       		.byte	0
+ 687 0074 0A000000 		.word	10
+ 688 0078 0000     		.short	0
+ 689 007a 8403     		.short	900
+ 690 007c 3F02     		.short	575
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 19
+
+
+ 691 007e 01       		.byte	1
+ 692 007f 00       		.byte	0
+ 693 0080 32000000 		.word	50
+ 694 0084 0000     		.short	0
+ 695 0086 8403     		.short	900
+ 696 0088 3F02     		.short	575
+ 697 008a 00       		.byte	0
+ 698 008b 00       		.byte	0
+ 699 008c 0A000000 		.word	10
+ 700 0090 4900     		.short	73
+ 701 0092 0000     		.short	0
+ 702 0094 0000     		.short	0
+ 703 0096 00       		.byte	0
+ 704 0097 00       		.byte	0
+ 705 0098 32000000 		.word	50
+ 706 009c 4F00     		.short	79
+ 707 009e 0000     		.short	0
+ 708 00a0 0000     		.short	0
+ 709 00a2 00       		.byte	0
+ 710 00a3 00       		.byte	0
+ 711 00a4 32000000 		.word	50
+ 712 00a8 0000     		.short	0
+ 713 00aa 0000     		.short	0
+ 714 00ac 0000     		.short	0
+ 715 00ae 00       		.byte	0
+ 716 00af 00       		.byte	0
+ 717 00b0 0A000000 		.word	10
+ 718 00b4 0000     		.short	0
+ 719 00b6 BA04     		.short	1210
+ 720 00b8 4502     		.short	581
+ 721 00ba 00       		.byte	0
+ 722 00bb 00       		.byte	0
+ 723 00bc 0A000000 		.word	10
+ 724 00c0 0000     		.short	0
+ 725 00c2 BA04     		.short	1210
+ 726 00c4 4502     		.short	581
+ 727 00c6 01       		.byte	1
+ 728 00c7 00       		.byte	0
+ 729 00c8 32000000 		.word	50
+ 730 00cc 0000     		.short	0
+ 731 00ce BA04     		.short	1210
+ 732 00d0 4502     		.short	581
+ 733 00d2 00       		.byte	0
+ 734 00d3 00       		.byte	0
+ 735 00d4 0A000000 		.word	10
+ 736 00d8 0000     		.short	0
+ 737 00da C003     		.short	960
+ 738 00dc 9E02     		.short	670
+ 739 00de 00       		.byte	0
+ 740 00df 00       		.byte	0
+ 741 00e0 0A000000 		.word	10
+ 742 00e4 0000     		.short	0
+ 743 00e6 C003     		.short	960
+ 744 00e8 9E02     		.short	670
+ 745 00ea 01       		.byte	1
+ 746 00eb 00       		.byte	0
+ 747 00ec 32000000 		.word	50
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 20
+
+
+ 748 00f0 0000     		.short	0
+ 749 00f2 C003     		.short	960
+ 750 00f4 9E02     		.short	670
+ 751 00f6 00       		.byte	0
+ 752 00f7 00       		.byte	0
+ 753 00f8 0A000000 		.word	10
+ 754 00fc 0000     		.short	0
+ 755 00fe 8403     		.short	900
+ 756 0100 3F02     		.short	575
+ 757 0102 00       		.byte	0
+ 758 0103 00       		.byte	0
+ 759 0104 0A000000 		.word	10
+ 760 0108 0000     		.short	0
+ 761 010a 8403     		.short	900
+ 762 010c 3F02     		.short	575
+ 763 010e 01       		.byte	1
+ 764 010f 00       		.byte	0
+ 765 0110 32000000 		.word	50
+ 766 0114 0000     		.short	0
+ 767 0116 8403     		.short	900
+ 768 0118 3F02     		.short	575
+ 769 011a 00       		.byte	0
+ 770 011b 00       		.byte	0
+ 771 011c 0A000000 		.word	10
+ 772 0120 4900     		.short	73
+ 773 0122 0000     		.short	0
+ 774 0124 0000     		.short	0
+ 775 0126 00       		.byte	0
+ 776 0127 00       		.byte	0
+ 777 0128 32000000 		.word	50
+ 778 012c 4F00     		.short	79
+ 779 012e 0000     		.short	0
+ 780 0130 0000     		.short	0
+ 781 0132 00       		.byte	0
+ 782 0133 00       		.byte	0
+ 783 0134 32000000 		.word	50
+ 784 0138 0000     		.short	0
+ 785 013a 0000     		.short	0
+ 786 013c 0000     		.short	0
+ 787 013e 00       		.byte	0
+ 788 013f 00       		.byte	0
+ 789 0140 21000000 		.word	33
+ 790              		.section	.rodata.MACRO_SEQUENCE_100,"a"
+ 791              		.align	2
+ 794              	MACRO_SEQUENCE_100:
+ 795 0000 4900     		.short	73
+ 796 0002 0000     		.short	0
+ 797 0004 0000     		.short	0
+ 798 0006 00       		.byte	0
+ 799 0007 00       		.byte	0
+ 800 0008 32000000 		.word	50
+ 801 000c 4F00     		.short	79
+ 802 000e 0000     		.short	0
+ 803 0010 0000     		.short	0
+ 804 0012 00       		.byte	0
+ 805 0013 00       		.byte	0
+ 806 0014 32000000 		.word	50
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 21
+
+
+ 807 0018 0000     		.short	0
+ 808 001a 0000     		.short	0
+ 809 001c 0000     		.short	0
+ 810 001e 00       		.byte	0
+ 811 001f 00       		.byte	0
+ 812 0020 0A000000 		.word	10
+ 813 0024 0000     		.short	0
+ 814 0026 BA04     		.short	1210
+ 815 0028 4502     		.short	581
+ 816 002a 00       		.byte	0
+ 817 002b 00       		.byte	0
+ 818 002c 0A000000 		.word	10
+ 819 0030 0000     		.short	0
+ 820 0032 BA04     		.short	1210
+ 821 0034 4502     		.short	581
+ 822 0036 01       		.byte	1
+ 823 0037 00       		.byte	0
+ 824 0038 32000000 		.word	50
+ 825 003c 0000     		.short	0
+ 826 003e BA04     		.short	1210
+ 827 0040 4502     		.short	581
+ 828 0042 00       		.byte	0
+ 829 0043 00       		.byte	0
+ 830 0044 0A000000 		.word	10
+ 831 0048 0000     		.short	0
+ 832 004a C003     		.short	960
+ 833 004c 9E02     		.short	670
+ 834 004e 00       		.byte	0
+ 835 004f 00       		.byte	0
+ 836 0050 0A000000 		.word	10
+ 837 0054 0000     		.short	0
+ 838 0056 C003     		.short	960
+ 839 0058 9E02     		.short	670
+ 840 005a 01       		.byte	1
+ 841 005b 00       		.byte	0
+ 842 005c 32000000 		.word	50
+ 843 0060 0000     		.short	0
+ 844 0062 C003     		.short	960
+ 845 0064 9E02     		.short	670
+ 846 0066 00       		.byte	0
+ 847 0067 00       		.byte	0
+ 848 0068 0A000000 		.word	10
+ 849 006c 0000     		.short	0
+ 850 006e 8403     		.short	900
+ 851 0070 3F02     		.short	575
+ 852 0072 00       		.byte	0
+ 853 0073 00       		.byte	0
+ 854 0074 0A000000 		.word	10
+ 855 0078 0000     		.short	0
+ 856 007a 8403     		.short	900
+ 857 007c 3F02     		.short	575
+ 858 007e 01       		.byte	1
+ 859 007f 00       		.byte	0
+ 860 0080 32000000 		.word	50
+ 861 0084 0000     		.short	0
+ 862 0086 8403     		.short	900
+ 863 0088 3F02     		.short	575
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 22
+
+
+ 864 008a 00       		.byte	0
+ 865 008b 00       		.byte	0
+ 866 008c 0A000000 		.word	10
+ 867 0090 4900     		.short	73
+ 868 0092 0000     		.short	0
+ 869 0094 0000     		.short	0
+ 870 0096 00       		.byte	0
+ 871 0097 00       		.byte	0
+ 872 0098 32000000 		.word	50
+ 873 009c 4F00     		.short	79
+ 874 009e 0000     		.short	0
+ 875 00a0 0000     		.short	0
+ 876 00a2 00       		.byte	0
+ 877 00a3 00       		.byte	0
+ 878 00a4 32000000 		.word	50
+ 879 00a8 0000     		.short	0
+ 880 00aa 0000     		.short	0
+ 881 00ac 0000     		.short	0
+ 882 00ae 00       		.byte	0
+ 883 00af 00       		.byte	0
+ 884 00b0 21000000 		.word	33
+ 885              		.section	.rodata.MACRO_SEQUENCE_50,"a"
+ 886              		.align	2
+ 889              	MACRO_SEQUENCE_50:
+ 890 0000 4900     		.short	73
+ 891 0002 0000     		.short	0
+ 892 0004 0000     		.short	0
+ 893 0006 00       		.byte	0
+ 894 0007 00       		.byte	0
+ 895 0008 32000000 		.word	50
+ 896 000c 4F00     		.short	79
+ 897 000e 0000     		.short	0
+ 898 0010 0000     		.short	0
+ 899 0012 00       		.byte	0
+ 900 0013 00       		.byte	0
+ 901 0014 32000000 		.word	50
+ 902 0018 0000     		.short	0
+ 903 001a 0000     		.short	0
+ 904 001c 0000     		.short	0
+ 905 001e 00       		.byte	0
+ 906 001f 00       		.byte	0
+ 907 0020 0A000000 		.word	10
+ 908 0024 0000     		.short	0
+ 909 0026 8504     		.short	1157
+ 910 0028 4702     		.short	583
+ 911 002a 00       		.byte	0
+ 912 002b 00       		.byte	0
+ 913 002c 0A000000 		.word	10
+ 914 0030 0000     		.short	0
+ 915 0032 8504     		.short	1157
+ 916 0034 4702     		.short	583
+ 917 0036 01       		.byte	1
+ 918 0037 00       		.byte	0
+ 919 0038 32000000 		.word	50
+ 920 003c 0000     		.short	0
+ 921 003e 8504     		.short	1157
+ 922 0040 4702     		.short	583
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 23
+
+
+ 923 0042 00       		.byte	0
+ 924 0043 00       		.byte	0
+ 925 0044 0A000000 		.word	10
+ 926 0048 0000     		.short	0
+ 927 004a C003     		.short	960
+ 928 004c 9E02     		.short	670
+ 929 004e 00       		.byte	0
+ 930 004f 00       		.byte	0
+ 931 0050 0A000000 		.word	10
+ 932 0054 0000     		.short	0
+ 933 0056 C003     		.short	960
+ 934 0058 9E02     		.short	670
+ 935 005a 01       		.byte	1
+ 936 005b 00       		.byte	0
+ 937 005c 32000000 		.word	50
+ 938 0060 0000     		.short	0
+ 939 0062 C003     		.short	960
+ 940 0064 9E02     		.short	670
+ 941 0066 00       		.byte	0
+ 942 0067 00       		.byte	0
+ 943 0068 0A000000 		.word	10
+ 944 006c 0000     		.short	0
+ 945 006e 8403     		.short	900
+ 946 0070 3F02     		.short	575
+ 947 0072 00       		.byte	0
+ 948 0073 00       		.byte	0
+ 949 0074 0A000000 		.word	10
+ 950 0078 0000     		.short	0
+ 951 007a 8403     		.short	900
+ 952 007c 3F02     		.short	575
+ 953 007e 01       		.byte	1
+ 954 007f 00       		.byte	0
+ 955 0080 32000000 		.word	50
+ 956 0084 0000     		.short	0
+ 957 0086 8403     		.short	900
+ 958 0088 3F02     		.short	575
+ 959 008a 00       		.byte	0
+ 960 008b 00       		.byte	0
+ 961 008c 0A000000 		.word	10
+ 962 0090 4900     		.short	73
+ 963 0092 0000     		.short	0
+ 964 0094 0000     		.short	0
+ 965 0096 00       		.byte	0
+ 966 0097 00       		.byte	0
+ 967 0098 32000000 		.word	50
+ 968 009c 4F00     		.short	79
+ 969 009e 0000     		.short	0
+ 970 00a0 0000     		.short	0
+ 971 00a2 00       		.byte	0
+ 972 00a3 00       		.byte	0
+ 973 00a4 32000000 		.word	50
+ 974 00a8 0000     		.short	0
+ 975 00aa 0000     		.short	0
+ 976 00ac 0000     		.short	0
+ 977 00ae 00       		.byte	0
+ 978 00af 00       		.byte	0
+ 979 00b0 21000000 		.word	33
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 24
+
+
+ 980              		.section	.rodata.MACRO_SEQUENCE_20,"a"
+ 981              		.align	2
+ 984              	MACRO_SEQUENCE_20:
+ 985 0000 4900     		.short	73
+ 986 0002 0000     		.short	0
+ 987 0004 0000     		.short	0
+ 988 0006 00       		.byte	0
+ 989 0007 00       		.byte	0
+ 990 0008 32000000 		.word	50
+ 991 000c 4F00     		.short	79
+ 992 000e 0000     		.short	0
+ 993 0010 0000     		.short	0
+ 994 0012 00       		.byte	0
+ 995 0013 00       		.byte	0
+ 996 0014 32000000 		.word	50
+ 997 0018 0000     		.short	0
+ 998 001a 0000     		.short	0
+ 999 001c 0000     		.short	0
+ 1000 001e 00       		.byte	0
+ 1001 001f 00       		.byte	0
+ 1002 0020 0A000000 		.word	10
+ 1003 0024 0000     		.short	0
+ 1004 0026 5404     		.short	1108
+ 1005 0028 4802     		.short	584
+ 1006 002a 00       		.byte	0
+ 1007 002b 00       		.byte	0
+ 1008 002c 0A000000 		.word	10
+ 1009 0030 0000     		.short	0
+ 1010 0032 5404     		.short	1108
+ 1011 0034 4802     		.short	584
+ 1012 0036 01       		.byte	1
+ 1013 0037 00       		.byte	0
+ 1014 0038 32000000 		.word	50
+ 1015 003c 0000     		.short	0
+ 1016 003e 5404     		.short	1108
+ 1017 0040 4802     		.short	584
+ 1018 0042 00       		.byte	0
+ 1019 0043 00       		.byte	0
+ 1020 0044 0A000000 		.word	10
+ 1021 0048 0000     		.short	0
+ 1022 004a C003     		.short	960
+ 1023 004c 9E02     		.short	670
+ 1024 004e 00       		.byte	0
+ 1025 004f 00       		.byte	0
+ 1026 0050 0A000000 		.word	10
+ 1027 0054 0000     		.short	0
+ 1028 0056 C003     		.short	960
+ 1029 0058 9E02     		.short	670
+ 1030 005a 01       		.byte	1
+ 1031 005b 00       		.byte	0
+ 1032 005c 32000000 		.word	50
+ 1033 0060 0000     		.short	0
+ 1034 0062 C003     		.short	960
+ 1035 0064 9E02     		.short	670
+ 1036 0066 00       		.byte	0
+ 1037 0067 00       		.byte	0
+ 1038 0068 0A000000 		.word	10
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 25
+
+
+ 1039 006c 0000     		.short	0
+ 1040 006e 8403     		.short	900
+ 1041 0070 3F02     		.short	575
+ 1042 0072 00       		.byte	0
+ 1043 0073 00       		.byte	0
+ 1044 0074 0A000000 		.word	10
+ 1045 0078 0000     		.short	0
+ 1046 007a 8403     		.short	900
+ 1047 007c 3F02     		.short	575
+ 1048 007e 01       		.byte	1
+ 1049 007f 00       		.byte	0
+ 1050 0080 32000000 		.word	50
+ 1051 0084 0000     		.short	0
+ 1052 0086 8403     		.short	900
+ 1053 0088 3F02     		.short	575
+ 1054 008a 00       		.byte	0
+ 1055 008b 00       		.byte	0
+ 1056 008c 0A000000 		.word	10
+ 1057 0090 4900     		.short	73
+ 1058 0092 0000     		.short	0
+ 1059 0094 0000     		.short	0
+ 1060 0096 00       		.byte	0
+ 1061 0097 00       		.byte	0
+ 1062 0098 32000000 		.word	50
+ 1063 009c 4F00     		.short	79
+ 1064 009e 0000     		.short	0
+ 1065 00a0 0000     		.short	0
+ 1066 00a2 00       		.byte	0
+ 1067 00a3 00       		.byte	0
+ 1068 00a4 32000000 		.word	50
+ 1069 00a8 0000     		.short	0
+ 1070 00aa 0000     		.short	0
+ 1071 00ac 0000     		.short	0
+ 1072 00ae 00       		.byte	0
+ 1073 00af 00       		.byte	0
+ 1074 00b0 21000000 		.word	33
+ 1075              		.section	.rodata.MACRO_SEQUENCE_10,"a"
+ 1076              		.align	2
+ 1079              	MACRO_SEQUENCE_10:
+ 1080 0000 4900     		.short	73
+ 1081 0002 0000     		.short	0
+ 1082 0004 0000     		.short	0
+ 1083 0006 00       		.byte	0
+ 1084 0007 00       		.byte	0
+ 1085 0008 32000000 		.word	50
+ 1086 000c 4F00     		.short	79
+ 1087 000e 0000     		.short	0
+ 1088 0010 0000     		.short	0
+ 1089 0012 00       		.byte	0
+ 1090 0013 00       		.byte	0
+ 1091 0014 32000000 		.word	50
+ 1092 0018 0000     		.short	0
+ 1093 001a 0000     		.short	0
+ 1094 001c 0000     		.short	0
+ 1095 001e 00       		.byte	0
+ 1096 001f 00       		.byte	0
+ 1097 0020 0A000000 		.word	10
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 26
+
+
+ 1098 0024 0000     		.short	0
+ 1099 0026 1604     		.short	1046
+ 1100 0028 4502     		.short	581
+ 1101 002a 00       		.byte	0
+ 1102 002b 00       		.byte	0
+ 1103 002c 0A000000 		.word	10
+ 1104 0030 0000     		.short	0
+ 1105 0032 1604     		.short	1046
+ 1106 0034 4502     		.short	581
+ 1107 0036 01       		.byte	1
+ 1108 0037 00       		.byte	0
+ 1109 0038 32000000 		.word	50
+ 1110 003c 0000     		.short	0
+ 1111 003e 1604     		.short	1046
+ 1112 0040 4502     		.short	581
+ 1113 0042 00       		.byte	0
+ 1114 0043 00       		.byte	0
+ 1115 0044 0A000000 		.word	10
+ 1116 0048 0000     		.short	0
+ 1117 004a C003     		.short	960
+ 1118 004c 9E02     		.short	670
+ 1119 004e 00       		.byte	0
+ 1120 004f 00       		.byte	0
+ 1121 0050 0A000000 		.word	10
+ 1122 0054 0000     		.short	0
+ 1123 0056 C003     		.short	960
+ 1124 0058 9E02     		.short	670
+ 1125 005a 01       		.byte	1
+ 1126 005b 00       		.byte	0
+ 1127 005c 32000000 		.word	50
+ 1128 0060 0000     		.short	0
+ 1129 0062 C003     		.short	960
+ 1130 0064 9E02     		.short	670
+ 1131 0066 00       		.byte	0
+ 1132 0067 00       		.byte	0
+ 1133 0068 0A000000 		.word	10
+ 1134 006c 0000     		.short	0
+ 1135 006e 8403     		.short	900
+ 1136 0070 3F02     		.short	575
+ 1137 0072 00       		.byte	0
+ 1138 0073 00       		.byte	0
+ 1139 0074 0A000000 		.word	10
+ 1140 0078 0000     		.short	0
+ 1141 007a 8403     		.short	900
+ 1142 007c 3F02     		.short	575
+ 1143 007e 01       		.byte	1
+ 1144 007f 00       		.byte	0
+ 1145 0080 32000000 		.word	50
+ 1146 0084 0000     		.short	0
+ 1147 0086 8403     		.short	900
+ 1148 0088 3F02     		.short	575
+ 1149 008a 00       		.byte	0
+ 1150 008b 00       		.byte	0
+ 1151 008c 0A000000 		.word	10
+ 1152 0090 4900     		.short	73
+ 1153 0092 0000     		.short	0
+ 1154 0094 0000     		.short	0
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 27
+
+
+ 1155 0096 00       		.byte	0
+ 1156 0097 00       		.byte	0
+ 1157 0098 32000000 		.word	50
+ 1158 009c 4F00     		.short	79
+ 1159 009e 0000     		.short	0
+ 1160 00a0 0000     		.short	0
+ 1161 00a2 00       		.byte	0
+ 1162 00a3 00       		.byte	0
+ 1163 00a4 32000000 		.word	50
+ 1164 00a8 0000     		.short	0
+ 1165 00aa 0000     		.short	0
+ 1166 00ac 0000     		.short	0
+ 1167 00ae 00       		.byte	0
+ 1168 00af 00       		.byte	0
+ 1169 00b0 21000000 		.word	33
+ 1170              		.section	.data.current_mode_,"aw"
+ 1173              	current_mode_:
+ 1174 0000 01       		.byte	1
+ 1175              		.section	.bss.keyboard_report,"aw",%nobits
+ 1176              		.align	2
+ 1179              	keyboard_report:
+ 1180 0000 00000000 		.space	8
+ 1180      00000000 
+ 1181              		.text
+ 1182              	.Letext0:
+ 1183              		.file 2 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 1184              		.file 3 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 1185              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 1186              		.file 5 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/inc
+ 1187              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 1188              		.file 7 "Bsp/bsp_key.h"
+ 1189              		.file 8 "App/app_macro.h"
+ 1190              		.file 9 "App/app_ec11.h"
+ 1191              		.file 10 "Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h"
+ 1192              		.file 11 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/..
+ 1193              		.file 12 "Middlewares/ST/STM32_USB_Device_Library/Class/HID/Inc/usbd_hid.h"
+ 1194              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cciYrEum.s 			page 28
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 app_keyboard.c
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:19     .text.processNormalKeyboard:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:24     .text.processNormalKeyboard:00000000 processNormalKeyboard
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:158    .text.processNormalKeyboard:00000084 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:481    .bss.last_scan_time.1:00000000 last_scan_time.1
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:492    .rodata.NUMPAD_MAP:00000000 NUMPAD_MAP
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:475    .bss.last_report.0:00000000 last_report.0
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:166    .text.appKeyboardInit:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:172    .text.appKeyboardInit:00000000 appKeyboardInit
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:195    .text.appKeyboardUpdate:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:201    .text.appKeyboardUpdate:00000000 appKeyboardUpdate
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:301    .text.appKeyboardUpdate:00000064 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:318    .text.appKeyboardUpdate:000000a8 $t
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:383    .text.appKeyboardUpdate:000000f4 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:486    .bss.last_btn_state.2:00000000 last_btn_state.2
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:1173   .data.current_mode_:00000000 current_mode_
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:1079   .rodata.MACRO_SEQUENCE_10:00000000 MACRO_SEQUENCE_10
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:984    .rodata.MACRO_SEQUENCE_20:00000000 MACRO_SEQUENCE_20
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:889    .rodata.MACRO_SEQUENCE_50:00000000 MACRO_SEQUENCE_50
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:794    .rodata.MACRO_SEQUENCE_100:00000000 MACRO_SEQUENCE_100
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:627    .rodata.MACRO_SEQUENCE_200:00000000 MACRO_SEQUENCE_200
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:598    .rodata.MACRO_SEQUENCE_ADDHEALTH:00000000 MACRO_SEQUENCE_ADDHEALTH
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:569    .rodata.MACRO_SEQUENCE_ADDBULLET:00000000 MACRO_SEQUENCE_ADDBULLET
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:396    .text.Keyboard_Send_Key:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:402    .text.Keyboard_Send_Key:00000000 Keyboard_Send_Key
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:466    .text.Keyboard_Send_Key:00000038 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:1179   .bss.keyboard_report:00000000 keyboard_report
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:472    .bss.last_report.0:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:478    .bss.last_scan_time.1:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:487    .bss.last_btn_state.2:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:489    .rodata.NUMPAD_MAP:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:566    .rodata.MACRO_SEQUENCE_ADDBULLET:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:595    .rodata.MACRO_SEQUENCE_ADDHEALTH:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:624    .rodata.MACRO_SEQUENCE_200:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:791    .rodata.MACRO_SEQUENCE_100:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:886    .rodata.MACRO_SEQUENCE_50:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:981    .rodata.MACRO_SEQUENCE_20:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:1076   .rodata.MACRO_SEQUENCE_10:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cciYrEum.s:1176   .bss.keyboard_report:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GetTick
+HAL_GPIO_ReadPin
+memcmp
+USBD_HID_SendReport
+hUsbDeviceFS
+bspKeyInit
+appMacroInit
+appEc11GetButtonState
+bspKeyScan
+appMacroUpdate
+appMacroIsRunning
+appMacroPlay
+HAL_Delay

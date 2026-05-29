@@ -1,0 +1,519 @@
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"app_macro.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "App/app_macro.c"
+  18              		.section	.text.appMacroInit,"ax",%progbits
+  19              		.align	1
+  20              		.global	appMacroInit
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	appMacroInit:
+  26              	.LFB68:
+   1:App/app_macro.c **** #include "app_macro.h"
+   2:App/app_macro.c **** #include "usart.h"
+   3:App/app_macro.c **** #include "referee_protocol.h"
+   4:App/app_macro.c **** #include "referee_frame_process.h"
+   5:App/app_macro.c **** #include "string.h"
+   6:App/app_macro.c **** 
+   7:App/app_macro.c **** typedef struct {
+   8:App/app_macro.c ****     bool is_running_;
+   9:App/app_macro.c ****     const MacroFrame* current_sequence_;
+  10:App/app_macro.c ****     uint16_t sequence_length_;
+  11:App/app_macro.c ****     uint16_t current_step_;
+  12:App/app_macro.c ****     uint32_t step_start_tick_;
+  13:App/app_macro.c ****     uint32_t last_tx_tick_;
+  14:App/app_macro.c **** } MacroContext;
+  15:App/app_macro.c **** 
+  16:App/app_macro.c **** static MacroContext macro_ctx_ = {0};
+  17:App/app_macro.c **** static custom_client_data_t custom_client_data_ = {0};
+  18:App/app_macro.c **** static uint8_t client_data_buffer_[8] = {0};
+  19:App/app_macro.c **** 
+  20:App/app_macro.c **** void appMacroInit(void) {
+  27              		.loc 1 20 25 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  21:App/app_macro.c ****     macro_ctx_.is_running_ = false;
+  32              		.loc 1 21 5 view .LVU1
+  33              		.loc 1 21 28 is_stmt 0 view .LVU2
+  34 0000 014B     		ldr	r3, .L2
+  35 0002 0022     		movs	r2, #0
+  36 0004 1A70     		strb	r2, [r3]
+  22:App/app_macro.c **** }
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 2
+
+
+  37              		.loc 1 22 1 view .LVU3
+  38 0006 7047     		bx	lr
+  39              	.L3:
+  40              		.align	2
+  41              	.L2:
+  42 0008 00000000 		.word	macro_ctx_
+  43              		.cfi_endproc
+  44              	.LFE68:
+  46              		.section	.text.appMacroPlay,"ax",%progbits
+  47              		.align	1
+  48              		.global	appMacroPlay
+  49              		.syntax unified
+  50              		.thumb
+  51              		.thumb_func
+  53              	appMacroPlay:
+  54              	.LVL0:
+  55              	.LFB69:
+  23:App/app_macro.c **** 
+  24:App/app_macro.c **** bool appMacroPlay(const MacroFrame* macro_sequence, uint16_t sequence_length) {
+  56              		.loc 1 24 79 is_stmt 1 view -0
+  57              		.cfi_startproc
+  58              		@ args = 0, pretend = 0, frame = 0
+  59              		@ frame_needed = 0, uses_anonymous_args = 0
+  60              		.loc 1 24 79 is_stmt 0 view .LVU5
+  61 0000 38B5     		push	{r3, r4, r5, lr}
+  62              	.LCFI0:
+  63              		.cfi_def_cfa_offset 16
+  64              		.cfi_offset 3, -16
+  65              		.cfi_offset 4, -12
+  66              		.cfi_offset 5, -8
+  67              		.cfi_offset 14, -4
+  68 0002 0346     		mov	r3, r0
+  25:App/app_macro.c ****     if (macro_ctx_.is_running_ || macro_sequence == NULL || sequence_length == 0) {
+  69              		.loc 1 25 5 is_stmt 1 view .LVU6
+  70              		.loc 1 25 19 is_stmt 0 view .LVU7
+  71 0004 0A4A     		ldr	r2, .L8
+  72 0006 1078     		ldrb	r0, [r2]	@ zero_extendqisi2
+  73              	.LVL1:
+  74              		.loc 1 25 8 view .LVU8
+  75 0008 78B9     		cbnz	r0, .L6
+  76              		.loc 1 25 32 discriminator 1 view .LVU9
+  77 000a 7BB1     		cbz	r3, .L5
+  78              		.loc 1 25 58 discriminator 2 view .LVU10
+  79 000c 71B1     		cbz	r1, .L5
+  26:App/app_macro.c ****         return false; 
+  27:App/app_macro.c ****     }
+  28:App/app_macro.c ****     
+  29:App/app_macro.c ****     macro_ctx_.current_sequence_ = macro_sequence;
+  80              		.loc 1 29 5 is_stmt 1 view .LVU11
+  81              		.loc 1 29 34 is_stmt 0 view .LVU12
+  82 000e 1546     		mov	r5, r2
+  83 0010 5360     		str	r3, [r2, #4]
+  30:App/app_macro.c ****     macro_ctx_.sequence_length_ = sequence_length;
+  84              		.loc 1 30 5 is_stmt 1 view .LVU13
+  85              		.loc 1 30 33 is_stmt 0 view .LVU14
+  86 0012 1181     		strh	r1, [r2, #8]	@ movhi
+  31:App/app_macro.c ****     macro_ctx_.current_step_ = 0;
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 3
+
+
+  87              		.loc 1 31 5 is_stmt 1 view .LVU15
+  88              		.loc 1 31 30 is_stmt 0 view .LVU16
+  89 0014 0023     		movs	r3, #0
+  90              	.LVL2:
+  91              		.loc 1 31 30 view .LVU17
+  92 0016 5381     		strh	r3, [r2, #10]	@ movhi
+  32:App/app_macro.c ****     macro_ctx_.is_running_ = true;
+  93              		.loc 1 32 5 is_stmt 1 view .LVU18
+  94              		.loc 1 32 28 is_stmt 0 view .LVU19
+  95 0018 0124     		movs	r4, #1
+  96 001a 1470     		strb	r4, [r2]
+  33:App/app_macro.c ****     
+  34:App/app_macro.c ****     uint32_t current_tick = HAL_GetTick();
+  97              		.loc 1 34 5 is_stmt 1 view .LVU20
+  98              		.loc 1 34 29 is_stmt 0 view .LVU21
+  99 001c FFF7FEFF 		bl	HAL_GetTick
+ 100              	.LVL3:
+  35:App/app_macro.c ****     macro_ctx_.step_start_tick_ = current_tick;
+ 101              		.loc 1 35 5 is_stmt 1 view .LVU22
+ 102              		.loc 1 35 33 is_stmt 0 view .LVU23
+ 103 0020 E860     		str	r0, [r5, #12]
+  36:App/app_macro.c ****     macro_ctx_.last_tx_tick_ = current_tick - 33; // 确保立刻发送第一帧
+ 104              		.loc 1 36 5 is_stmt 1 view .LVU24
+ 105              		.loc 1 36 45 is_stmt 0 view .LVU25
+ 106 0022 2138     		subs	r0, r0, #33
+ 107              	.LVL4:
+ 108              		.loc 1 36 30 view .LVU26
+ 109 0024 2861     		str	r0, [r5, #16]
+  37:App/app_macro.c ****     
+  38:App/app_macro.c ****     return true;
+ 110              		.loc 1 38 5 is_stmt 1 view .LVU27
+ 111              		.loc 1 38 12 is_stmt 0 view .LVU28
+ 112 0026 2046     		mov	r0, r4
+ 113 0028 00E0     		b	.L5
+ 114              	.LVL5:
+ 115              	.L6:
+  26:App/app_macro.c ****     }
+ 116              		.loc 1 26 16 view .LVU29
+ 117 002a 0020     		movs	r0, #0
+ 118              	.LVL6:
+ 119              	.L5:
+  39:App/app_macro.c **** }
+ 120              		.loc 1 39 1 view .LVU30
+ 121 002c 38BD     		pop	{r3, r4, r5, pc}
+ 122              	.L9:
+ 123 002e 00BF     		.align	2
+ 124              	.L8:
+ 125 0030 00000000 		.word	macro_ctx_
+ 126              		.cfi_endproc
+ 127              	.LFE69:
+ 129              		.section	.text.appMacroIsRunning,"ax",%progbits
+ 130              		.align	1
+ 131              		.global	appMacroIsRunning
+ 132              		.syntax unified
+ 133              		.thumb
+ 134              		.thumb_func
+ 136              	appMacroIsRunning:
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 4
+
+
+ 137              	.LFB70:
+  40:App/app_macro.c **** 
+  41:App/app_macro.c **** bool appMacroIsRunning(void) {
+ 138              		.loc 1 41 30 is_stmt 1 view -0
+ 139              		.cfi_startproc
+ 140              		@ args = 0, pretend = 0, frame = 0
+ 141              		@ frame_needed = 0, uses_anonymous_args = 0
+ 142              		@ link register save eliminated.
+  42:App/app_macro.c ****     return macro_ctx_.is_running_;
+ 143              		.loc 1 42 5 view .LVU32
+  43:App/app_macro.c **** }
+ 144              		.loc 1 43 1 is_stmt 0 view .LVU33
+ 145 0000 014B     		ldr	r3, .L11
+ 146 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 147 0004 7047     		bx	lr
+ 148              	.L12:
+ 149 0006 00BF     		.align	2
+ 150              	.L11:
+ 151 0008 00000000 		.word	macro_ctx_
+ 152              		.cfi_endproc
+ 153              	.LFE70:
+ 155              		.section	.text.appMacroUpdate,"ax",%progbits
+ 156              		.align	1
+ 157              		.global	appMacroUpdate
+ 158              		.syntax unified
+ 159              		.thumb
+ 160              		.thumb_func
+ 162              	appMacroUpdate:
+ 163              	.LFB71:
+  44:App/app_macro.c **** 
+  45:App/app_macro.c **** void appMacroUpdate(void) {
+ 164              		.loc 1 45 27 is_stmt 1 view -0
+ 165              		.cfi_startproc
+ 166              		@ args = 0, pretend = 0, frame = 0
+ 167              		@ frame_needed = 0, uses_anonymous_args = 0
+  46:App/app_macro.c ****     if (!macro_ctx_.is_running_) {
+ 168              		.loc 1 46 5 view .LVU35
+ 169              		.loc 1 46 20 is_stmt 0 view .LVU36
+ 170 0000 2C4B     		ldr	r3, .L23
+ 171 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 172              		.loc 1 46 8 view .LVU37
+ 173 0004 03B9     		cbnz	r3, .L20
+ 174 0006 7047     		bx	lr
+ 175              	.L20:
+  45:App/app_macro.c ****     if (!macro_ctx_.is_running_) {
+ 176              		.loc 1 45 27 view .LVU38
+ 177 0008 70B5     		push	{r4, r5, r6, lr}
+ 178              	.LCFI1:
+ 179              		.cfi_def_cfa_offset 16
+ 180              		.cfi_offset 4, -16
+ 181              		.cfi_offset 5, -12
+ 182              		.cfi_offset 6, -8
+ 183              		.cfi_offset 14, -4
+  47:App/app_macro.c ****         return;
+  48:App/app_macro.c ****     }
+  49:App/app_macro.c **** 
+  50:App/app_macro.c ****     uint32_t current_tick = HAL_GetTick();
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 5
+
+
+ 184              		.loc 1 50 5 is_stmt 1 view .LVU39
+ 185              		.loc 1 50 29 is_stmt 0 view .LVU40
+ 186 000a FFF7FEFF 		bl	HAL_GetTick
+ 187              	.LVL7:
+ 188 000e 0446     		mov	r4, r0
+ 189              	.LVL8:
+  51:App/app_macro.c **** 
+  52:App/app_macro.c ****     if (current_tick - macro_ctx_.step_start_tick_ >= macro_ctx_.current_sequence_[macro_ctx_.curre
+ 190              		.loc 1 52 5 is_stmt 1 view .LVU41
+ 191              		.loc 1 52 34 is_stmt 0 view .LVU42
+ 192 0010 2849     		ldr	r1, .L23
+ 193 0012 CB68     		ldr	r3, [r1, #12]
+ 194              		.loc 1 52 22 view .LVU43
+ 195 0014 C21A     		subs	r2, r0, r3
+ 196              		.loc 1 52 65 view .LVU44
+ 197 0016 4868     		ldr	r0, [r1, #4]
+ 198              	.LVL9:
+ 199              		.loc 1 52 94 view .LVU45
+ 200 0018 4B89     		ldrh	r3, [r1, #10]
+ 201              		.loc 1 52 83 view .LVU46
+ 202 001a 03EB4301 		add	r1, r3, r3, lsl #1
+ 203 001e 00EB8101 		add	r1, r0, r1, lsl #2
+ 204              		.loc 1 52 109 view .LVU47
+ 205 0022 8968     		ldr	r1, [r1, #8]
+ 206              		.loc 1 52 8 view .LVU48
+ 207 0024 8A42     		cmp	r2, r1
+ 208 0026 07D3     		bcc	.L15
+  53:App/app_macro.c ****         macro_ctx_.current_step_++;
+ 209              		.loc 1 53 9 is_stmt 1 view .LVU49
+ 210              		.loc 1 53 33 is_stmt 0 view .LVU50
+ 211 0028 0133     		adds	r3, r3, #1
+ 212 002a 9BB2     		uxth	r3, r3
+ 213 002c 214A     		ldr	r2, .L23
+ 214 002e 5381     		strh	r3, [r2, #10]	@ movhi
+  54:App/app_macro.c ****         macro_ctx_.step_start_tick_ = current_tick;
+ 215              		.loc 1 54 9 is_stmt 1 view .LVU51
+ 216              		.loc 1 54 37 is_stmt 0 view .LVU52
+ 217 0030 D460     		str	r4, [r2, #12]
+  55:App/app_macro.c **** 
+  56:App/app_macro.c ****         if (macro_ctx_.current_step_ >= macro_ctx_.sequence_length_) {
+ 218              		.loc 1 56 9 is_stmt 1 view .LVU53
+ 219              		.loc 1 56 51 is_stmt 0 view .LVU54
+ 220 0032 1289     		ldrh	r2, [r2, #8]
+ 221              		.loc 1 56 12 view .LVU55
+ 222 0034 9342     		cmp	r3, r2
+ 223 0036 05D2     		bcs	.L21
+ 224              	.L15:
+  57:App/app_macro.c ****             macro_ctx_.is_running_ = false;
+  58:App/app_macro.c ****             return;
+  59:App/app_macro.c ****         }
+  60:App/app_macro.c ****     }
+  61:App/app_macro.c **** 
+  62:App/app_macro.c ****     if (current_tick - macro_ctx_.last_tx_tick_ >= 33) {
+ 225              		.loc 1 62 5 is_stmt 1 view .LVU56
+ 226              		.loc 1 62 34 is_stmt 0 view .LVU57
+ 227 0038 1E4B     		ldr	r3, .L23
+ 228 003a 1B69     		ldr	r3, [r3, #16]
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 6
+
+
+ 229              		.loc 1 62 22 view .LVU58
+ 230 003c E31A     		subs	r3, r4, r3
+ 231              		.loc 1 62 8 view .LVU59
+ 232 003e 202B     		cmp	r3, #32
+ 233 0040 04D8     		bhi	.L22
+ 234              	.L13:
+  63:App/app_macro.c ****         const MacroFrame* current_frame = &macro_ctx_.current_sequence_[macro_ctx_.current_step_];
+  64:App/app_macro.c ****         
+  65:App/app_macro.c ****         custom_client_data_.key_value = current_frame->key_value_;
+  66:App/app_macro.c ****         custom_client_data_.x_position = current_frame->x_position_;
+  67:App/app_macro.c ****         custom_client_data_.y_position = current_frame->y_position_;
+  68:App/app_macro.c ****         custom_client_data_.mouse_left = current_frame->mouse_left_;
+  69:App/app_macro.c ****         custom_client_data_.mouse_right = current_frame->mouse_right_;
+  70:App/app_macro.c **** 
+  71:App/app_macro.c ****         memcpy(client_data_buffer_, &custom_client_data_, 8);
+  72:App/app_macro.c ****         HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data_buffer_, 8), getRefSentDat
+  73:App/app_macro.c **** 
+  74:App/app_macro.c ****         macro_ctx_.last_tx_tick_ = current_tick;
+  75:App/app_macro.c ****     }
+  76:App/app_macro.c **** }...
+ 235              		.loc 1 76 1 view .LVU60
+ 236 0042 70BD     		pop	{r4, r5, r6, pc}
+ 237              	.LVL10:
+ 238              	.L21:
+  57:App/app_macro.c ****             macro_ctx_.is_running_ = false;
+ 239              		.loc 1 57 13 is_stmt 1 view .LVU61
+  57:App/app_macro.c ****             macro_ctx_.is_running_ = false;
+ 240              		.loc 1 57 36 is_stmt 0 view .LVU62
+ 241 0044 1B4B     		ldr	r3, .L23
+ 242 0046 0022     		movs	r2, #0
+ 243 0048 1A70     		strb	r2, [r3]
+  58:App/app_macro.c ****             return;
+ 244              		.loc 1 58 13 is_stmt 1 view .LVU63
+ 245 004a FAE7     		b	.L13
+ 246              	.L22:
+ 247              	.LBB2:
+  63:App/app_macro.c ****         const MacroFrame* current_frame = &macro_ctx_.current_sequence_[macro_ctx_.current_step_];
+ 248              		.loc 1 63 9 view .LVU64
+  63:App/app_macro.c ****         const MacroFrame* current_frame = &macro_ctx_.current_sequence_[macro_ctx_.current_step_];
+ 249              		.loc 1 63 83 is_stmt 0 view .LVU65
+ 250 004c 194E     		ldr	r6, .L23
+ 251 004e 7389     		ldrh	r3, [r6, #10]
+  63:App/app_macro.c ****         const MacroFrame* current_frame = &macro_ctx_.current_sequence_[macro_ctx_.current_step_];
+ 252              		.loc 1 63 72 view .LVU66
+ 253 0050 03EB4303 		add	r3, r3, r3, lsl #1
+  63:App/app_macro.c ****         const MacroFrame* current_frame = &macro_ctx_.current_sequence_[macro_ctx_.current_step_];
+ 254              		.loc 1 63 27 view .LVU67
+ 255 0054 00EB8302 		add	r2, r0, r3, lsl #2
+ 256              	.LVL11:
+  65:App/app_macro.c ****         custom_client_data_.key_value = current_frame->key_value_;
+ 257              		.loc 1 65 9 is_stmt 1 view .LVU68
+  65:App/app_macro.c ****         custom_client_data_.key_value = current_frame->key_value_;
+ 258              		.loc 1 65 54 is_stmt 0 view .LVU69
+ 259 0058 30F82310 		ldrh	r1, [r0, r3, lsl #2]
+  65:App/app_macro.c ****         custom_client_data_.key_value = current_frame->key_value_;
+ 260              		.loc 1 65 39 view .LVU70
+ 261 005c 164B     		ldr	r3, .L23+4
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 7
+
+
+ 262 005e 1980     		strh	r1, [r3]	@ movhi
+  66:App/app_macro.c ****         custom_client_data_.x_position = current_frame->x_position_;
+ 263              		.loc 1 66 9 is_stmt 1 view .LVU71
+  66:App/app_macro.c ****         custom_client_data_.x_position = current_frame->x_position_;
+ 264              		.loc 1 66 55 is_stmt 0 view .LVU72
+ 265 0060 5088     		ldrh	r0, [r2, #2]
+  66:App/app_macro.c ****         custom_client_data_.x_position = current_frame->x_position_;
+ 266              		.loc 1 66 40 view .LVU73
+ 267 0062 5988     		ldrh	r1, [r3, #2]
+ 268 0064 60F30B01 		bfi	r1, r0, #0, #12
+ 269 0068 5980     		strh	r1, [r3, #2]	@ movhi
+  67:App/app_macro.c ****         custom_client_data_.y_position = current_frame->y_position_;
+ 270              		.loc 1 67 9 is_stmt 1 view .LVU74
+  67:App/app_macro.c ****         custom_client_data_.y_position = current_frame->y_position_;
+ 271              		.loc 1 67 55 is_stmt 0 view .LVU75
+ 272 006a 9088     		ldrh	r0, [r2, #4]
+  67:App/app_macro.c ****         custom_client_data_.y_position = current_frame->y_position_;
+ 273              		.loc 1 67 40 view .LVU76
+ 274 006c 9988     		ldrh	r1, [r3, #4]
+ 275 006e 60F30B01 		bfi	r1, r0, #0, #12
+ 276 0072 9980     		strh	r1, [r3, #4]	@ movhi
+  68:App/app_macro.c ****         custom_client_data_.mouse_left = current_frame->mouse_left_;
+ 277              		.loc 1 68 9 is_stmt 1 view .LVU77
+  68:App/app_macro.c ****         custom_client_data_.mouse_left = current_frame->mouse_left_;
+ 278              		.loc 1 68 55 is_stmt 0 view .LVU78
+ 279 0074 9079     		ldrb	r0, [r2, #6]	@ zero_extendqisi2
+  68:App/app_macro.c ****         custom_client_data_.mouse_left = current_frame->mouse_left_;
+ 280              		.loc 1 68 40 view .LVU79
+ 281 0076 D978     		ldrb	r1, [r3, #3]	@ zero_extendqisi2
+ 282 0078 60F30711 		bfi	r1, r0, #4, #4
+ 283 007c D970     		strb	r1, [r3, #3]
+  69:App/app_macro.c ****         custom_client_data_.mouse_right = current_frame->mouse_right_;
+ 284              		.loc 1 69 9 is_stmt 1 view .LVU80
+  69:App/app_macro.c ****         custom_client_data_.mouse_right = current_frame->mouse_right_;
+ 285              		.loc 1 69 56 is_stmt 0 view .LVU81
+ 286 007e D179     		ldrb	r1, [r2, #7]	@ zero_extendqisi2
+  69:App/app_macro.c ****         custom_client_data_.mouse_right = current_frame->mouse_right_;
+ 287              		.loc 1 69 41 view .LVU82
+ 288 0080 5A79     		ldrb	r2, [r3, #5]	@ zero_extendqisi2
+ 289              	.LVL12:
+  69:App/app_macro.c ****         custom_client_data_.mouse_right = current_frame->mouse_right_;
+ 290              		.loc 1 69 41 view .LVU83
+ 291 0082 61F30712 		bfi	r2, r1, #4, #4
+ 292 0086 5A71     		strb	r2, [r3, #5]
+  71:App/app_macro.c ****         memcpy(client_data_buffer_, &custom_client_data_, 8);
+ 293              		.loc 1 71 9 is_stmt 1 view .LVU84
+ 294 0088 0C4D     		ldr	r5, .L23+8
+ 295 008a 93E80300 		ldm	r3, {r0, r1}
+ 296 008e 85E80300 		stm	r5, {r0, r1}
+  72:App/app_macro.c ****         HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data_buffer_, 8), getRefSentDat
+ 297              		.loc 1 72 9 view .LVU85
+  72:App/app_macro.c ****         HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data_buffer_, 8), getRefSentDat
+ 298              		.loc 1 72 36 is_stmt 0 view .LVU86
+ 299 0092 0822     		movs	r2, #8
+ 300 0094 2946     		mov	r1, r5
+ 301 0096 40F20630 		movw	r0, #774
+ 302 009a FFF7FEFF 		bl	referee_pack_data
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 8
+
+
+ 303              	.LVL13:
+  72:App/app_macro.c ****         HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data_buffer_, 8), getRefSentDat
+ 304              		.loc 1 72 36 view .LVU87
+ 305 009e 0546     		mov	r5, r0
+  72:App/app_macro.c ****         HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data_buffer_, 8), getRefSentDat
+ 306              		.loc 1 72 9 discriminator 1 view .LVU88
+ 307 00a0 FFF7FEFF 		bl	getRefSentDataLen
+ 308              	.LVL14:
+ 309 00a4 0246     		mov	r2, r0
+  72:App/app_macro.c ****         HAL_UART_Transmit(&huart1, referee_pack_data(0x0306, client_data_buffer_, 8), getRefSentDat
+ 310              		.loc 1 72 9 discriminator 2 view .LVU89
+ 311 00a6 1E23     		movs	r3, #30
+ 312 00a8 2946     		mov	r1, r5
+ 313 00aa 0548     		ldr	r0, .L23+12
+ 314 00ac FFF7FEFF 		bl	HAL_UART_Transmit
+ 315              	.LVL15:
+  74:App/app_macro.c ****         macro_ctx_.last_tx_tick_ = current_tick;
+ 316              		.loc 1 74 9 is_stmt 1 view .LVU90
+  74:App/app_macro.c ****         macro_ctx_.last_tx_tick_ = current_tick;
+ 317              		.loc 1 74 34 is_stmt 0 view .LVU91
+ 318 00b0 3461     		str	r4, [r6, #16]
+ 319 00b2 C6E7     		b	.L13
+ 320              	.L24:
+ 321              		.align	2
+ 322              	.L23:
+ 323 00b4 00000000 		.word	macro_ctx_
+ 324 00b8 00000000 		.word	custom_client_data_
+ 325 00bc 00000000 		.word	client_data_buffer_
+ 326 00c0 00000000 		.word	huart1
+ 327              	.LBE2:
+ 328              		.cfi_endproc
+ 329              	.LFE71:
+ 331              		.section	.bss.client_data_buffer_,"aw",%nobits
+ 332              		.align	2
+ 335              	client_data_buffer_:
+ 336 0000 00000000 		.space	8
+ 336      00000000 
+ 337              		.section	.bss.custom_client_data_,"aw",%nobits
+ 338              		.align	2
+ 341              	custom_client_data_:
+ 342 0000 00000000 		.space	8
+ 342      00000000 
+ 343              		.section	.bss.macro_ctx_,"aw",%nobits
+ 344              		.align	2
+ 347              	macro_ctx_:
+ 348 0000 00000000 		.space	20
+ 348      00000000 
+ 348      00000000 
+ 348      00000000 
+ 348      00000000 
+ 349              		.text
+ 350              	.Letext0:
+ 351              		.file 2 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 352              		.file 3 "D:\\ST\\STM32CubeCLT_1.19.0\\GNU-tools-for-STM32\\bin/../lib/gcc/arm-none-eabi/13.3.1/../
+ 353              		.file 4 "App/app_macro.h"
+ 354              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 355              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 9
+
+
+ 356              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 357              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 358              		.file 9 "rm_referee_system/referee_protocol.h"
+ 359              		.file 10 "rm_referee_system/referee_frame_process.h"
+ 360              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 361              		.file 12 "Core/Inc/usart.h"
+ARM GAS  C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 app_macro.c
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:19     .text.appMacroInit:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:25     .text.appMacroInit:00000000 appMacroInit
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:42     .text.appMacroInit:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:347    .bss.macro_ctx_:00000000 macro_ctx_
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:47     .text.appMacroPlay:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:53     .text.appMacroPlay:00000000 appMacroPlay
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:125    .text.appMacroPlay:00000030 $d
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:130    .text.appMacroIsRunning:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:136    .text.appMacroIsRunning:00000000 appMacroIsRunning
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:151    .text.appMacroIsRunning:00000008 $d
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:156    .text.appMacroUpdate:00000000 $t
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:162    .text.appMacroUpdate:00000000 appMacroUpdate
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:323    .text.appMacroUpdate:000000b4 $d
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:341    .bss.custom_client_data_:00000000 custom_client_data_
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:335    .bss.client_data_buffer_:00000000 client_data_buffer_
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:332    .bss.client_data_buffer_:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:338    .bss.custom_client_data_:00000000 $d
+C:\Users\flipp\AppData\Local\Temp\cco9hWIc.s:344    .bss.macro_ctx_:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GetTick
+referee_pack_data
+getRefSentDataLen
+HAL_UART_Transmit
+huart1

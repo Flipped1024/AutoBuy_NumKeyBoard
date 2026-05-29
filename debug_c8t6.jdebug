@@ -4,8 +4,8 @@
 *                         www.segger.com                             *
 **********************************************************************
 
-File          : D:/RoboMaster/AutoBuy_NumKeyBoard/debug.jdebug
-Created       : 20 May 2026 15:18
+File          : D:/RoboMaster/AutoBuy_NumKeyBoard_C8T6/debug_c8t6.jdebug
+Created       : 23 May 2026 02:51
 Ozone Version : V3.34
 */
 
@@ -22,9 +22,9 @@ void OnProjectLoad (void) {
   //
   // Dialog-generated settings
   //
-  Project.AddPathSubstitute ("D:/RoboMaster/AutoBuy_NumKeyBoard", "$(ProjectDir)");
-  Project.AddPathSubstitute ("d:/robomaster/autobuy_numkeyboard", "$(ProjectDir)");
-  Project.SetDevice ("STM32F103C6");
+  Project.AddPathSubstitute ("D:/RoboMaster/AutoBuy_NumKeyBoard_C8T6", "$(ProjectDir)");
+  Project.AddPathSubstitute ("d:/robomaster/autobuy_numkeyboard_c8t6", "$(ProjectDir)");
+  Project.SetDevice ("STM32F103C8");
   Project.SetHostIF ("USB", "20741223");
   Project.SetTargetIF ("SWD");
   Project.SetTIFSpeed ("4 MHz");
@@ -32,7 +32,7 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  File.Open ("$(ProjectDir)/build/AutoBuy_NumKeyBoard.elf");
+  File.Open ("$(ProjectDir)/build/AutoBuy_NumKeyBoard_C8T6.elf");
 }
 
 /*********************************************************************
